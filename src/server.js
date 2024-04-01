@@ -1,5 +1,5 @@
 import app from "./app.js";
-import { connectDB, disconnectDB } from "./utils/mongoDB/mongooseSetup.js";
+import { connectDB, disconnectDB } from "#mongoDB/mongooseSetup.js";
 
 const PORT = process.env.PORT || 3000;
 

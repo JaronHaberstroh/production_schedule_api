@@ -11,6 +11,9 @@
   },
   "author": "Jaron Haberstroh",
   "license": "ISC",
+  "imports": {
+    "#mongoDB/*": "./src/utils/mongoDB/*"
+  },
   "dependencies": {
     "cors": "^2.8.5",
     "dotenv": "^16.4.5",

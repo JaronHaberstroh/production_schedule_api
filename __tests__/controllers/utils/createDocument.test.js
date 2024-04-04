@@ -1,7 +1,6 @@
 // @vitest-environment mongoose
 
 import createDocument from "#controllers/utils/createDocument.js";
-import { expect } from "vitest";
 
 describe("createDocumnet()", () => {
   test("should return success object on successful completion", async () => {

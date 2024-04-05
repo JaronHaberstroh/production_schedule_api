@@ -12,7 +12,8 @@
   "author": "Jaron Haberstroh",
   "license": "ISC",
   "imports": {
-    "#mongoDB/*": "./src/utils/mongoDB/*"
+    "#mongoDB/*": "./src/utils/mongoDB/*",
+    "#controllers/*": "./src/controllers/*"
   },
   "dependencies": {
     "cors": "^2.8.5",

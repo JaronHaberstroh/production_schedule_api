@@ -1,3 +1,5 @@
+import { Error } from "mongoose";
+
 const readDocument = async (model, params) => {
   let result;
   try {

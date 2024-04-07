@@ -13,7 +13,7 @@ export default {
     // Create mocks for Express objects and functions
     const mockReq = {};
     const mockRes = {
-      status: vi.fn(),
+      status: vi.fn(() => mockRes),
       json: vi.fn(),
       headersSent: false,
     };

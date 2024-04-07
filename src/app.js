@@ -1,6 +1,7 @@
 import express from "express";
 import cors from "cors";
 import { config } from "dotenv";
+import unhanledRoutesHandler from "./middleware/unhandledRoutesHandler.js";
 
 config({ path: `./.env.${process.env.NODE_ENV}` });
 
@@ -15,5 +16,8 @@ app.use(express.json());
 
 // Enable body parser
 app.use(express.urlencoded({ extended: true }));
+
+// Handle unhandled routes
+app.use(unhanledRoutesHandler);
 
 export default app;

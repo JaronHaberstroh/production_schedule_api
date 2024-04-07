@@ -12,6 +12,7 @@
   "author": "Jaron Haberstroh",
   "license": "ISC",
   "imports": {
+    "#utils/*": "./src/utils/*",
     "#mongoDB/*": "./src/utils/mongoDB/*",
     "#controllers/*": "./src/controllers/*"
   },

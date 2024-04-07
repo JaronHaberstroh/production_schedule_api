@@ -20,4 +20,7 @@ app.use(express.urlencoded({ extended: true }));
 // Handle unhandled routes
 app.use(unhanledRoutesHandler);
 
+// Error handler
+app.use(errorHandler);
+
 export default app;

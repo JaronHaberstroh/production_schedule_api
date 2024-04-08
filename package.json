@@ -14,7 +14,8 @@
   "imports": {
     "#utils/*": "./src/utils/*",
     "#mongoDB/*": "./src/utils/mongoDB/*",
-    "#controllers/*": "./src/controllers/*"
+    "#controllers/*": "./src/controllers/*",
+    "#models/*": "./src/models/*"
   },
   "dependencies": {
     "cors": "^2.8.5",

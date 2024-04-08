@@ -2,8 +2,9 @@
     "compilerOptions": {
         "baseUrl": ".",
         "paths": {
+            "#utils/*": ["./src/utils/*"],
             "#mongoDB/*": ["./src/utils/mongoDB/*"],
-            "#controllers/*": ["./src/controllers/*"]
+            "#controllers/*": ["./src/controllers/*"],
         }
     },
     "exclude": ["node_modules"]

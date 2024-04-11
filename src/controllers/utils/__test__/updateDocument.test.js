@@ -10,14 +10,14 @@ describe("updateDocument()", () => {
     testDocument = await document.save();
 
     // Create updateDocumentData
-    updateDocumentData = [
-      testDocument._id,
-      { name: "Jane", age: 34, gender: "female" },
-    ];
+    updateDocumentData = {
+      query: testDocument._id,
+      params: { name: "Jane", age: 34, gender: "female" },
+    };
   });
 
   test("should return success object when successful", async () => {
-    // Update document
+    // Call update document
     const result = await updateDocumment(testModel, updateDocumentData);
 
     // Expect successful return object
@@ -31,15 +31,18 @@ describe("updateDocument()", () => {
     // Update document
     const result = await updateDocumment(testModel, updateDocumentData);
 
+    // Call update document
     const updatedDocument = await testModel.findOne(testDocument._id);
 
     // Expect document to have been updated
-    expect(updatedDocument.name).toBe(updateDocumentData[1].name);
+    expect(updatedDocument.name).toBe(updateDocumentData.params.name);
   });
 
   test("should return fail object when fails", async () => {
-    updateDocumentData[0] = null;
-    // Update document
+    // Alter test variables to force fail
+    updateDocumentData.query = null;
+
+    // Call update document
     const result = await updateDocumment(testModel, updateDocumentData);
 
     // Expect failure return object

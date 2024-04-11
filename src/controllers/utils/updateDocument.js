@@ -4,7 +4,7 @@ const updateDocumment = async (model, params) => {
   let result;
   try {
     // Update document
-    result = await model.updateOne({ _id: params[0] }, params[1]);
+    result = await model.updateOne({ _id: params.query }, params.params);
 
     // Throw Error when document not found
     if (!result.matchedCount) {

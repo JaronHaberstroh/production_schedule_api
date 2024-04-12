@@ -5,6 +5,8 @@ import { config } from "dotenv";
 import unhanledRoutesHandler from "./middleware/unhandledRoutesHandler.js";
 import errorHandler from "./middleware/errorHandler.js";
 
+import departmentRoutes from "./routes/departmentRoutes.js";
+
 config({ path: `./.env.${process.env.NODE_ENV}` });
 
 // Init app instance
@@ -18,6 +20,9 @@ app.use(express.json());
 
 // Enable body parser
 app.use(express.urlencoded({ extended: true }));
+
+// Mount routes
+app.use("/department", departmentRoutes);
 
 // Handle unhandled routes
 app.use(unhanledRoutesHandler);

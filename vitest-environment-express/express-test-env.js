@@ -1,15 +1,7 @@
-import { connectDB, disconnectDB } from "#mongoDB/mongooseSetup.js";
-
 export default {
   name: "express-env",
   transformMode: "ssr",
   async setup() {
-    // Init DB variables
-    let mongoConnection, mongoServer;
-
-    // Connect to DB
-    ({ mongoConnection, mongoServer } = await connectDB());
-
     // Create mocks for Express objects and functions
     const mockReq = {};
     const mockRes = {
@@ -25,10 +17,7 @@ export default {
     globalThis.mockNext = mockNext;
 
     return {
-      async teardown() {
-        // Disconnect from DB
-        disconnectDB(mongoConnection, mongoServer);
-      },
+      async teardown() {},
     };
   },
 };

@@ -1,7 +1,9 @@
 import express from "express";
 import cors from "cors";
 import { config } from "dotenv";
+
 import unhanledRoutesHandler from "./middleware/unhandledRoutesHandler.js";
+import errorHandler from "./middleware/errorHandler.js";
 
 config({ path: `./.env.${process.env.NODE_ENV}` });
 

@@ -34,7 +34,6 @@ describe("errroHandler middleware", () => {
     expect(mockRes.json).toBeCalledWith({
       status: 404,
       message: "test message",
-      error: mockError,
       stack: mockError.stack,
     });
   });

@@ -1,16 +1,15 @@
 const createDocument = async (model, params) => {
-  let savedDocument;
   try {
     // Create new document
     const newDocument = new model(params);
 
     // Save new document
-    savedDocument = await newDocument.save();
+    const savedDocument = await newDocument.save();
 
     // Return success object
     return {
       success: true,
-      message: `Successfully saved model: ${model.name}`,
+      message: `Successfully saved new document; {model: ${model.modelName}}`,
       data: savedDocument,
       error: null,
     };
@@ -20,8 +19,8 @@ const createDocument = async (model, params) => {
     // Return fail object
     return {
       success: false,
-      message: error.message || `Failed to save document`,
-      data: savedDocument,
+      message: `Failed to save new document: ${error.message}`,
+      data: null,
       error: error,
     };
   }

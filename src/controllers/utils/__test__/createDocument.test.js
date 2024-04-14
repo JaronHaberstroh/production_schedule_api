@@ -7,6 +7,8 @@ describe("createDocumnet()", () => {
     // Create document
     const document = await createDocument(testModel, testData);
 
+    console.log(document.message);
+
     // Expect successful return object
     expect(document.success).toBeTruthy();
     expect(document.message).toBeTruthy();
@@ -32,7 +34,7 @@ describe("createDocumnet()", () => {
 
     expect(document.success).toBeFalsy();
     expect(document.message).toBeTruthy();
-    expect(document.data).toBe(undefined);
+    expect(document.data).toBe(null);
     expect(document.error).toBeTypeOf("object");
   });
 });

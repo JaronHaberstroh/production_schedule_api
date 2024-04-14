@@ -32,7 +32,7 @@ describe("Create department controller", () => {
 
   test("should return success response when successful", async () => {
     // Call create department controller
-    await createDepartment(mockReq, mockRes);
+    await createDepartment(mockReq, mockRes, mockNext);
 
     // Expect response to have been called
     expect(mockRes.status).toBeCalled();
@@ -43,9 +43,15 @@ describe("Create department controller", () => {
     // Alter department name to force test fail
     mockReq.body.departmentName = null;
 
+    // Call create department controller
+    await createDepartment(mockReq, mockRes, mockNext);
+
     // Expect Error to be thrown
-    await expect(createDepartment(mockReq, mockRes)).rejects.toThrowError(
-      new AppError("Department name is required", 400)
+    expect(mockNext).toBeCalledWith(
+      new AppError(
+        "Unable to save Department: Department name is required",
+        400
+      )
     );
   });
 
@@ -53,12 +59,18 @@ describe("Create department controller", () => {
     // Mock return value
     createDocument.mockReturnValue({
       success: false,
-      error: { message: "failed message" },
+      message: "failed message",
     });
 
+    // Call create department controller
+    await createDepartment(mockReq, mockRes, mockNext);
+
     // Expect Error to be thrown
-    await expect(createDepartment(mockReq, mockRes)).rejects.toThrowError(
-      new AppError(`Unable to save Department: failed message`, 500)
+    expect(mockNext).toBeCalledWith(
+      new AppError(
+        `Unable to save Department: Failed to create document: failed message`,
+        500
+      )
     );
   });
 });

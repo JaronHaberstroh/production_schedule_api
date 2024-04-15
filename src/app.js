@@ -5,7 +5,7 @@ import { config } from "dotenv";
 import unhanledRoutesHandler from "./middleware/unhandledRoutesHandler.js";
 import errorHandler from "./middleware/errorHandler.js";
 
-import departmentRoutes from "./routes/departmentRoutes.js";
+import apiRoutes from "./routes/index.routes.js";
 
 config({ path: `./.env.${process.env.NODE_ENV}` });
 
@@ -22,7 +22,7 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 // Mount routes
-app.use("/department", departmentRoutes);
+app.use("/api", apiRoutes);
 
 // Handle unhandled routes
 app.use(unhanledRoutesHandler);

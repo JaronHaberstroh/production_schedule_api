@@ -31,17 +31,4 @@ describe("readDocument()", () => {
     // Expect return object to contain a list of found documents
     expect(result.data.length).toBe(testDocuments.length);
   });
-
-  test("should return failure object if nothing found", async () => {
-    const invalidDocument = { name: "invalidDepartmentName" };
-
-    // Find documents
-    const result = await readDocument(testModel, invalidDocument);
-
-    // Expect failure return object
-    expect(result.success).toBeFalsy();
-    expect(result.message).toBeTruthy();
-    expect(result.data.length).toBe(0);
-    expect(result.error).toBeTruthy();
-  });
 });

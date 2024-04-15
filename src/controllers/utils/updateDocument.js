@@ -1,4 +1,4 @@
-import { Error } from "mongoose";
+import AppError from "#utils/appError.js";
 
 const updateDocumment = async (model, params) => {
   let result;
@@ -8,16 +8,17 @@ const updateDocumment = async (model, params) => {
 
     // Throw Error when document not found
     if (!result.matchedCount) {
-      throw new Error(`Failed to locate a matching document`);
+      throw new AppError(`Failed to locate a matching document`, 404);
     }
 
     // Throw Error when document not modified
     if (!result.modifiedCount) {
-      throw new Error("Failed to update document");
+      throw new AppError(`Document not modified`, 500);
     }
 
     // Return success object
     return {
+      statusCode: result.statusCode || 200,
       success: true,
       message: `Successfully updated document`,
       data: result,
@@ -27,9 +28,10 @@ const updateDocumment = async (model, params) => {
     // Handle errors
 
     return {
+      statusCode: error.statusCode,
       success: false,
-      message: error.message || `Failed to update document`,
-      data: result,
+      message: `Failed to update document: ${error.message}`,
+      data: null,
       error: error,
     };
   }

@@ -48,7 +48,7 @@ describe("updateDocument()", () => {
     // Expect failure return object
     expect(result.success).toBeFalsy();
     expect(result.message).toBeTruthy();
-    expect(result.data).toBeTruthy();
+    expect(result.data).toBe(null);
     expect(result.error).toBeTypeOf("object");
   });
 });

@@ -6,7 +6,7 @@ import readDepartment from "../readDepartment.js";
 
 const returnValues = {
   success: true,
-  error: { message: "failed message" },
+  message: "failed message",
 };
 
 // Mock read document function
@@ -36,36 +36,48 @@ describe("read department controller", () => {
 
   test("should return success response when successful", async () => {
     // Call read department controller
-    await readDepartment(mockReq, mockRes);
+    await readDepartment(mockReq, mockRes, mockNext);
 
     // Expect response to have been called
     expect(mockRes.status).toBeCalled();
     expect(mockRes.json).toBeCalled();
   });
 
-  test("should throw error if success is false", async () => {
+  test("should pass error to next if success false", async () => {
     // Mock return value
     readDocument.mockReturnValue({
       ...returnValues,
       success: false,
     });
 
-    // Expect Error to be thrown
-    await expect(readDepartment(mockReq, mockRes)).rejects.toThrowError(
-      new AppError("Failed to find departments: failed message", 500)
+    // Call read department controller
+    await readDepartment(mockReq, mockRes, mockNext);
+
+    // Expect next to have been called with error object
+    expect(mockNext).toBeCalledWith(
+      new AppError(
+        `Failed to find departments: Unable to find departments: ${returnValues.message}`,
+        500
+      )
     );
   });
 
-  test("should throw error if no data is found", async () => {
+  test("should pass error to next if no data found", async () => {
     // Mock return value
     readDocument.mockReturnValue({
       ...returnValues,
-      data: null,
+      data: [],
     });
 
-    // Expect Error to be thrown
-    await expect(readDepartment(mockReq, mockRes)).rejects.toThrowError(
-      new AppError("No data returned for search: Error", 500)
+    // Call read department controller
+    await readDepartment(mockReq, mockRes, mockNext);
+
+    // Expect next to have been called with error object
+    expect(mockNext).toBeCalledWith(
+      new AppError(
+        "Failed to find departments: No data returned from search:",
+        500
+      )
     );
   });
 });

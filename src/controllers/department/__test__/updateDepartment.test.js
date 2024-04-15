@@ -6,7 +6,7 @@ import updateDepartment from "../updateDepartment.js";
 
 const returnValues = {
   success: true,
-  error: { message: "failed message" },
+  message: "failed message",
 };
 
 vi.mock("#controllers/utils/updateDocument.js", () => {
@@ -30,8 +30,6 @@ describe("update department controller", () => {
       body: { departmentName: testData.departmentName },
       params: { _id: testData._id },
     };
-    // mockReq.body = { departmentName: testData.departmentName };
-    // mockReq.params = { _id: testData._id };
   });
 
   beforeEach(() => {
@@ -42,7 +40,7 @@ describe("update department controller", () => {
 
   test("should return success response when successful", async () => {
     // Call update department controller
-    await updateDepartment(mockReq, mockRes);
+    await updateDepartment(mockReq, mockRes, mockNext);
 
     // Expect response to have been called
     expect(mockRes.status).toBeCalled();
@@ -53,9 +51,12 @@ describe("update department controller", () => {
     // Alter test variables to force error
     mockReq.params._id = "";
 
+    // Call update department controller
+    await updateDepartment(mockReq, mockRes, mockNext);
+
     // Expect Error be thrown
-    await expect(updateDepartment(mockReq, mockRes)).rejects.toThrowError(
-      new AppError("Department id is required", 404)
+    expect(mockNext).toBeCalledWith(
+      new AppError("Failed to update document: Department id is required", 404)
     );
   });
 
@@ -63,9 +64,15 @@ describe("update department controller", () => {
     // Alter test variables to force error
     mockReq.body = "";
 
+    // Call update department controller
+    await updateDepartment(mockReq, mockRes, mockNext);
+
     // Expect Error to be thrown
-    await expect(updateDepartment(mockReq, mockRes)).rejects.toThrowError(
-      new AppError("Update requires changed properties be provided", 404)
+    expect(mockNext).toBeCalledWith(
+      new AppError(
+        "Failed to update document: Update requires changed properties be provided",
+        404
+      )
     );
   });
 
@@ -76,9 +83,15 @@ describe("update department controller", () => {
       success: false,
     });
 
+    // Call update department controller
+    await updateDepartment(mockReq, mockRes, mockNext);
+
     // Expect Error to be thrown
-    await expect(updateDepartment(mockReq, mockRes)).rejects.toThrowError(
-      new AppError("Failed to update document: failed message", 500)
+    await expect(mockNext).toBeCalledWith(
+      new AppError(
+        "Failed to update document: Document was not updated successfully: failed message",
+        500
+      )
     );
   });
 });

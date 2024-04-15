@@ -7,8 +7,6 @@ describe("createDocumnet()", () => {
     // Create document
     const document = await createDocument(testModel, testData);
 
-    console.log(document.message);
-
     // Expect successful return object
     expect(document.success).toBeTruthy();
     expect(document.message).toBeTruthy();

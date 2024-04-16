@@ -1,25 +1,21 @@
+import { successResponse, errorResponse } from "#responses/response.js";
+
 const readDocument = async (model, params) => {
+  let result;
   try {
-    // Find documents with provided params
-    const result = await model.find(params);
-
-    // Return success object
-    return {
-      success: true,
-      message: `Successfully returned documents`,
-      data: result,
-      error: null,
-    };
+    result = await model.find(params);
   } catch (error) {
-    // Handle error
-
-    return {
-      success: false,
-      message: error.message || `Failed to find documents`,
-      data: null,
-      error: error,
-    };
+    return errorResponse(
+      `Error finding documnet(s): ${error.message}`,
+      error.statusCode || 500
+    );
   }
+
+  if (result.length === 0) {
+    return errorResponse(`No documents found`, 404);
+  }
+
+  return successResponse(`Successfully returned documents`, 200, result);
 };
 
 export default readDocument;

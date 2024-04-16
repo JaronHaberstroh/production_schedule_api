@@ -1,29 +1,19 @@
+import { errorResponse, successResponse } from "#responses/response.js";
+
 const createDocument = async (model, params) => {
+  const newDocument = new model(params);
+
+  let savedDocument;
   try {
-    // Create new document
-    const newDocument = new model(params);
-
-    // Save new document
-    const savedDocument = await newDocument.save();
-
-    // Return success object
-    return {
-      success: true,
-      message: `Successfully saved new document; {model: ${model.modelName}}`,
-      data: savedDocument,
-      error: null,
-    };
+    savedDocument = await newDocument.save();
   } catch (error) {
-    // Handle Error
-
-    // Return fail object
-    return {
-      success: false,
-      message: `Failed to save new document: ${error.message}`,
-      data: null,
-      error: error,
-    };
+    return errorResponse(
+      `Error while saving new document: ${error.message}`,
+      error.statusCode || 500
+    );
   }
+
+  return successResponse(`Successfully saved new document`, 201, savedDocument);
 };
 
 export default createDocument;

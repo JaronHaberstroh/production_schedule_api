@@ -1,34 +1,21 @@
-import AppError from "#utils/appError.js";
+import { successResponse, errorResponse } from "#responses/response.js";
 
 const deleteDocument = async (model, params) => {
+  let result;
   try {
-    // Delete document matching params
-    const result = await model.deleteOne(params);
-
-    // Throw error if document not deleted
-    if (!result.deletedCount) {
-      throw new AppError(`Document not deleted`, 500);
-    }
-
-    // Return success object
-    return {
-      statusCode: 200,
-      success: true,
-      message: `Successfully deleted document`,
-      data: result,
-      error: null,
-    };
+    result = await model.deleteOne(params);
   } catch (error) {
-    // Handle Error
-
-    return {
-      statusCode: error.statusCode || 500,
-      success: false,
-      message: `Failed to delete document: ${error.message}`,
-      data: null,
-      error: error,
-    };
+    return errorResponse(
+      `Error deleting document: ${error.message}`,
+      error.statusCode || 500
+    );
   }
+
+  if (!result.deletedCount) {
+    return errorResponse(`Document not deleted`, 500);
+  }
+
+  return successResponse(`Successfully deleted document`, 200, result);
 };
 
 export default deleteDocument;

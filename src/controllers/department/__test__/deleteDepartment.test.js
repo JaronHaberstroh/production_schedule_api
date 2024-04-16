@@ -3,6 +3,7 @@
 import deleteDepartment from "../deleteDepartment.js";
 import deleteDocument from "#controllers/utils/deleteDocument.js";
 import AppError from "#utils/appError.js";
+import mongoose from "mongoose";
 
 vi.mock("#controllers/utils/deleteDocument.js", () => {
   return {
@@ -20,17 +21,17 @@ describe("delete department controller", () => {
   let testData;
   beforeAll(() => {
     testData = { _id: "testing", departmentName: "test department" };
-    mockReq.params = { _id: testData._id };
+    mockReq.params = { _id: new mongoose.Types.ObjectId() };
   });
 
   beforeEach(() => {
     // Reset test variables
-    mockReq.params._id = testData._id;
+    mockReq.params._id = new mongoose.Types.ObjectId();
   });
 
   test("should return success response when successful", async () => {
     // Call delete department controller
-    await deleteDepartment(mockReq, mockRes);
+    await deleteDepartment(mockReq, mockRes, mockNext);
 
     // Expect response to have been called
     expect(mockRes.status).toBeCalled();
@@ -41,9 +42,15 @@ describe("delete department controller", () => {
     // Alter _id to force test fail
     mockReq.params._id = null;
 
+    // Call delete department controller
+    await deleteDepartment(mockReq, mockRes, mockNext);
+
     // Expect Error to be thrown
-    await expect(deleteDepartment(mockReq, mockRes)).rejects.toThrowError(
-      new AppError("Department _id is required", 400)
+    expect(mockNext).toBeCalledWith(
+      new AppError(
+        "Failed to delete Department: Department _id is required",
+        400
+      )
     );
   });
 
@@ -51,12 +58,18 @@ describe("delete department controller", () => {
     // Mock return value
     deleteDocument.mockReturnValue({
       success: false,
-      error: { message: "failed message" },
+      message: "failed message",
     });
 
+    // Call delete department controller
+    await deleteDepartment(mockReq, mockRes, mockNext);
+
     // Expect Error to be thrown
-    await expect(deleteDepartment(mockReq, mockRes)).rejects.toThrowError(
-      new AppError("Failed to delete Department: failed message", 500)
+    expect(mockNext).toBeCalledWith(
+      new AppError(
+        "Failed to delete Department: Unable to delete Department: failed message",
+        500
+      )
     );
   });
 });

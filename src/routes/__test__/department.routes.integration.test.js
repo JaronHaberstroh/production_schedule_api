@@ -1,10 +1,9 @@
 // @vitest-environment integration
 
 import request from "supertest";
-import app from "../app.js";
+import app from "./src/app.js";
 import Department from "#models/department.js";
 import mongoose from "mongoose";
-import { beforeEach, describe } from "node_modules/vitest/dist/index.js";
 
 describe("Department Routes", () => {
   let testDepartments;

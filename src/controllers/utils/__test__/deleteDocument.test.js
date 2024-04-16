@@ -39,7 +39,7 @@ describe("deleteDocument()", () => {
     // Expect failure return object
     expect(result.success).toBeFalsy();
     expect(result.message).toBeTruthy();
-    expect(result.data.deletedCount).toBe(0);
+    expect(result.data).toBe(null);
     expect(result.error).toBeTypeOf("object");
   });
 });

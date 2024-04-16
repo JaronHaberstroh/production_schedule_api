@@ -16,7 +16,8 @@
     "#mongoDB/*": "./src/utils/mongoDB/*",
     "#controllers/*": "./src/controllers/*",
     "#models/*": "./src/models/*",
-    "#routes/*": "./src/routes/*"
+    "#routes/*": "./src/routes/*",
+    "#responses/*": "./src/responses/*"
   },
   "dependencies": {
     "cors": "^2.8.5",

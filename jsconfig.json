@@ -8,7 +8,8 @@
             "#mongoDB/*": ["./src/utils/mongoDB/*"],
             "#controllers/*": ["./src/controllers/*"],
             "#models/*": ["./src/models/*"],
-            "routes/*": ["./src/models/*"]
+            "#routes/*": ["./src/models/*"],
+            "#responses/*": ["./src/responses/*"]
         }
     },
     "exclude": ["node_modules"]

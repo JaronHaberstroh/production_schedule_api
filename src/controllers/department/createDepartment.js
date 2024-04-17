@@ -1,45 +1,50 @@
 import createDocument from "#controllers/utils/createDocument.js";
 import Department from "#models/department.js";
+import { successResponse } from "#responses/response.js";
 import AppError from "#utils/appError.js";
 
 const createDepartment = async (req, res, next) => {
   try {
-    // Extract req body
     const departmentData = req.body;
 
-    // Check if department name provided
-    if (!departmentData.departmentName) {
-      throw new AppError(`Department name is required`, 400);
+    const validationError = validateDepartmentData(departmentData);
+    if (validationError) {
+      return next(validationError);
     }
 
-    // Call createDocument helper function
     const result = await createDocument(Department, departmentData);
 
-    // Check if success
-    if (!result.success) {
-      throw new AppError(
-        `Failed to create document: ${result.message}`,
-        result.statusCode || 500
-      );
+    const error = handleResult(res, result);
+    if (error) {
+      return next(error);
     }
-
-    // Send success response
-    res.status(201).json({
-      statusCode: 201,
-      success: true,
-      message: `New Department document successfully created`,
-      data: result.data,
-      error: null,
-    });
   } catch (error) {
-    // Handle errors
     next(
       new AppError(
-        `Unable to save Department: ${error.message}`,
+        `Unhandled Exception: ${error.message}`,
         error.statusCode || 500
       )
     );
   }
+};
+
+const validateDepartmentData = (departmentData) => {
+  if (!departmentData.departmentName) {
+    return new AppError(`Department name is required`, 400);
+  }
+};
+
+const handleResult = (res, result) => {
+  if (result.error) {
+    return new AppError(
+      `Error while saving Department document: ${result.message}`,
+      result.statusCode || 500
+    );
+  }
+
+  res
+    .status(201)
+    .json(successResponse(result.message, result.statusCode, result));
 };
 
 export default createDepartment;

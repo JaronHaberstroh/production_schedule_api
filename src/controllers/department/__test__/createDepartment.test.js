@@ -60,17 +60,4 @@ describe("Create department controller", () => {
       )
     );
   });
-
-  test("should pass error to next when no departmentName given", async () => {
-    // Alter department name to force test fail
-    mockReq.body.departmentName = null;
-
-    // Call create department controller
-    await createDepartment(mockReq, mockRes, mockNext);
-
-    // Expect Error to be passed to next
-    expect(mockNext).toBeCalledWith(
-      new AppError("Department name is required")
-    );
-  });
 });

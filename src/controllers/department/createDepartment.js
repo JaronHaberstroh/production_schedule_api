@@ -7,11 +7,6 @@ const createDepartment = async (req, res, next) => {
   try {
     const departmentData = req.body;
 
-    const validationError = validateDepartmentData(departmentData);
-    if (validationError) {
-      return next(validationError);
-    }
-
     const result = await createDocument(Department, departmentData);
 
     const error = handleResult(res, result);
@@ -25,12 +20,6 @@ const createDepartment = async (req, res, next) => {
         error.statusCode || 500
       )
     );
-  }
-};
-
-const validateDepartmentData = (departmentData) => {
-  if (!departmentData.departmentName) {
-    return new AppError(`Department name is required`, 400);
   }
 };
 

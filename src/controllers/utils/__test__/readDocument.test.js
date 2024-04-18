@@ -1,6 +1,6 @@
 // @vitest-environment mongoose
 
-import readDocument from "#controllers/utils/readDocument.js";
+import readDocument from "../readDocument.js";
 
 describe("readDocument()", () => {
   let testDocuments;

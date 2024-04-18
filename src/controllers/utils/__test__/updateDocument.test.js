@@ -1,6 +1,6 @@
 // @vitest-environment mongoose
 
-import updateDocumment from "#controllers/utils/updateDocument.js";
+import updateDocumment from "../updateDocument.js";
 
 describe("updateDocument()", () => {
   let testDocument, updateDocumentData;

@@ -1,6 +1,6 @@
 // @vitest-environment mongoose
 
-import deleteDocument from "#controllers/utils/deleteDocument.js";
+import deleteDocument from "../deleteDocument.js";
 
 describe("deleteDocument()", () => {
   let testDocument;

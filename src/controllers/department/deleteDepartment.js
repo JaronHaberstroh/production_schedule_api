@@ -7,11 +7,6 @@ const deleteDepartment = async (req, res, next) => {
   try {
     const departmentId = req.params._id;
 
-    const validationError = validateDepartmentData(departmentId);
-    if (validationError) {
-      return next(validationError);
-    }
-
     const result = await deleteDocument(Department, { _id: departmentId });
 
     const error = handleResult(res, result);
@@ -25,12 +20,6 @@ const deleteDepartment = async (req, res, next) => {
         error.statusCode || 500
       )
     );
-  }
-};
-
-const validateDepartmentData = (departmentId) => {
-  if (!departmentId) {
-    return new AppError("Department _id is required", 400);
   }
 };
 

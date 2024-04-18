@@ -59,15 +59,4 @@ describe("Delete department controller", () => {
       )
     );
   });
-
-  test("should pass error to next if _id not provided", async () => {
-    // Alter _id to simulate missing _id param
-    mockReq.params._id = null;
-
-    // Call delete department controller
-    await deleteDepartment(mockReq, mockRes, mockNext);
-
-    // Expect Error to be passed to next
-    expect(mockNext).toBeCalledWith(new AppError("Department _id is required"));
-  });
 });

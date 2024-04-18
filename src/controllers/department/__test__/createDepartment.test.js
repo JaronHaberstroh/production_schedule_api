@@ -1,36 +1,43 @@
 // @vitest-environment express
 
-import createDepartment from "#controllers/department/createDepartment.js";
+import createDepartment from "../createDepartment.js";
 import createDocument from "#controllers/utils/createDocument.js";
 import AppError from "#utils/appError.js";
 
-// Mock create document function
-vi.mock("#controllers/utils/createDocument.js", () => {
-  return {
-    default: vi.fn((model, data) => {
-      return {
-        success: true,
-        model,
-        data,
-      };
-    }),
-  };
-});
+// Mock createDocument function
+vi.mock("#controllers/utils/createDocument.js", () => ({ default: vi.fn() }));
 
 describe("Create department controller", () => {
-  let testData;
+  // Setup test variables
+  const testData = { departmentName: "testDepartment" };
+
+  const mockCreateDocumentSuccess = {
+    success: true,
+    message: "test message",
+    data: { ...testData },
+    error: null,
+  };
+
+  const mockCreateDocumentError = {
+    success: false,
+    message: "failed message",
+    data: null,
+    error: new AppError(),
+  };
+
   beforeAll(() => {
     // Set test variables
-    testData = { departmentName: "testDepartment" };
-    mockReq = { body: testData };
+    mockReq = { body: { ...testData } };
   });
-
   beforeEach(() => {
-    // Reset departmentName variable
-    mockReq.body.departmentName = "testDepartment";
+    // Reset test variables
+    mockReq.body.departmentName = testData.departmentName;
   });
 
   test("should return success response when successful", async () => {
+    // Mock return value for successful operation
+    createDocument.mockResolvedValue(mockCreateDocumentSuccess);
+
     // Call create department controller
     await createDepartment(mockReq, mockRes, mockNext);
 
@@ -39,38 +46,31 @@ describe("Create department controller", () => {
     expect(mockRes.json).toBeCalled();
   });
 
-  test("should throw error when no departmentName given", async () => {
+  test("should pass error to next if unsuccessful", async () => {
+    // Mock return value for failed operation
+    createDocument.mockResolvedValue(mockCreateDocumentError);
+
+    // Call create department controller
+    await createDepartment(mockReq, mockRes, mockNext);
+
+    // Expect Error to be passed to next
+    expect(mockNext).toBeCalledWith(
+      new AppError(
+        `Error while saving Department document: ${mockCreateDocumentError.message}`
+      )
+    );
+  });
+
+  test("should pass error to next when no departmentName given", async () => {
     // Alter department name to force test fail
     mockReq.body.departmentName = null;
 
     // Call create department controller
     await createDepartment(mockReq, mockRes, mockNext);
 
-    // Expect Error to be thrown
+    // Expect Error to be passed to next
     expect(mockNext).toBeCalledWith(
-      new AppError(
-        "Unable to save Department: Department name is required",
-        400
-      )
-    );
-  });
-
-  test("should throw error if success is false", async () => {
-    // Mock return value
-    createDocument.mockReturnValue({
-      success: false,
-      message: "failed message",
-    });
-
-    // Call create department controller
-    await createDepartment(mockReq, mockRes, mockNext);
-
-    // Expect Error to be thrown
-    expect(mockNext).toBeCalledWith(
-      new AppError(
-        `Unable to save Department: Failed to create document: failed message`,
-        500
-      )
+      new AppError("Department name is required")
     );
   });
 });

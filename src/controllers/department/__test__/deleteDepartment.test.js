@@ -5,22 +5,26 @@ import deleteDocument from "#controllers/utils/deleteDocument.js";
 import AppError from "#utils/appError.js";
 import mongoose from "mongoose";
 
-vi.mock("#controllers/utils/deleteDocument.js", () => {
-  return {
-    default: vi.fn((model, data) => {
-      return {
-        success: true,
-        model,
-        data,
-      };
-    }),
-  };
-});
+// Mock deleteDocument function
+vi.mock("#controllers/utils/deleteDocument.js", () => ({ default: vi.fn() }));
 
-describe("delete department controller", () => {
-  let testData;
+describe("Delete department controller", () => {
+  // Setup test variables
+  const mockDeleteDocumentSuccess = {
+    success: true,
+    message: "test message",
+    data: { departmentName: "testDepartment" },
+    error: null,
+  };
+
+  const mockDeleteDocumentError = {
+    success: false,
+    message: "failed message",
+    data: null,
+    error: new AppError(),
+  };
+
   beforeAll(() => {
-    testData = { _id: "testing", departmentName: "test department" };
     mockReq.params = { _id: new mongoose.Types.ObjectId() };
   });
 
@@ -30,6 +34,9 @@ describe("delete department controller", () => {
   });
 
   test("should return success response when successful", async () => {
+    // Mock return value for successful operation
+    deleteDocument.mockResolvedValue(mockDeleteDocumentSuccess);
+
     // Call delete department controller
     await deleteDepartment(mockReq, mockRes, mockNext);
 
@@ -38,38 +45,29 @@ describe("delete department controller", () => {
     expect(mockRes.json).toBeCalled();
   });
 
-  test("should throw error if _id not provided", async () => {
-    // Alter _id to force test fail
+  test("should pass error to next when unsuccessful", async () => {
+    // Mock return value for failed operation
+    deleteDocument.mockReturnValue(mockDeleteDocumentError);
+
+    // Call delete department controller
+    await deleteDepartment(mockReq, mockRes, mockNext);
+
+    // Expect Error to be passed to next
+    expect(mockNext).toBeCalledWith(
+      new AppError(
+        `Error while deleting Department document: ${mockDeleteDocumentError.message}`
+      )
+    );
+  });
+
+  test("should pass error to next if _id not provided", async () => {
+    // Alter _id to simulate missing _id param
     mockReq.params._id = null;
 
     // Call delete department controller
     await deleteDepartment(mockReq, mockRes, mockNext);
 
-    // Expect Error to be thrown
-    expect(mockNext).toBeCalledWith(
-      new AppError(
-        "Failed to delete Department: Department _id is required",
-        400
-      )
-    );
-  });
-
-  test("should throw error if success is false", async () => {
-    // Mock return value
-    deleteDocument.mockReturnValue({
-      success: false,
-      message: "failed message",
-    });
-
-    // Call delete department controller
-    await deleteDepartment(mockReq, mockRes, mockNext);
-
-    // Expect Error to be thrown
-    expect(mockNext).toBeCalledWith(
-      new AppError(
-        "Failed to delete Department: Unable to delete Department: failed message",
-        500
-      )
-    );
+    // Expect Error to be passed to next
+    expect(mockNext).toBeCalledWith(new AppError("Department _id is required"));
   });
 });

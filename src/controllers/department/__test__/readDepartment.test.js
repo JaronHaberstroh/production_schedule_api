@@ -1,40 +1,36 @@
 // @vitest-environment express
 
+import readDepartment from "../readDepartment.js";
 import readDocument from "#controllers/utils/readDocument.js";
 import AppError from "#utils/appError.js";
-import readDepartment from "../readDepartment.js";
+import mongoose from "mongoose";
 
-const returnValues = {
-  success: true,
-  message: "failed message",
-};
+// Mock readDocument function
+vi.mock("#controllers/utils/readDocument.js", () => ({ default: vi.fn() }));
 
-// Mock read document function
-vi.mock("#controllers/utils/readDocument.js", () => {
-  return {
-    default: vi.fn((model, data) => {
-      return {
-        ...returnValues,
-        model,
-        data,
-      };
-    }),
+describe("Read department controller", () => {
+  // Setup test variables
+  const mockReadDocumentSuccess = {
+    success: true,
+    message: "test message",
+    data: { departmentName: "test" },
+    error: null,
   };
-});
 
-describe("read department controller", () => {
-  let testData;
+  const mockReadDocumentError = {
+    success: false,
+    message: "failed message",
+    data: null,
+    error: new AppError(),
+  };
   beforeAll(() => {
-    // Set test variables
-    testData = { _id: "testing", departmentName: "test department" };
-    mockReq.params = { _id: testData._id };
-  });
-
-  beforeEach(() => {
-    // Reset test variables
+    mockReq.params = { _id: new mongoose.Types.ObjectId() };
   });
 
   test("should return success response when successful", async () => {
+    // Mock return value for successful operation
+    readDocument.mockResolvedValue(mockReadDocumentSuccess);
+
     // Call read department controller
     await readDepartment(mockReq, mockRes, mockNext);
 
@@ -43,41 +39,31 @@ describe("read department controller", () => {
     expect(mockRes.json).toBeCalled();
   });
 
-  test("should pass error to next if success false", async () => {
-    // Mock return value
-    readDocument.mockReturnValue({
-      ...returnValues,
-      success: false,
-    });
+  test("should pass error to next when unsuccessful", async () => {
+    // Mock return value for failed operation
+    readDocument.mockResolvedValue(mockReadDocumentError);
 
     // Call read department controller
     await readDepartment(mockReq, mockRes, mockNext);
 
-    // Expect next to have been called with error object
+    // Expect Error to be passed to next
     expect(mockNext).toBeCalledWith(
       new AppError(
-        `Failed to find departments: Unable to find departments: ${returnValues.message}`,
-        500
+        `Error while fetching Department data: ${mockReadDocumentError.message}`
       )
     );
   });
 
   test("should pass error to next if no data found", async () => {
-    // Mock return value
-    readDocument.mockReturnValue({
-      ...returnValues,
-      data: [],
-    });
+    // Mock return value for successful operation with no returned results
+    readDocument.mockResolvedValue({ ...mockReadDocumentSuccess, data: [] });
 
     // Call read department controller
     await readDepartment(mockReq, mockRes, mockNext);
 
-    // Expect next to have been called with error object
+    // Expect Error to be passed to next
     expect(mockNext).toBeCalledWith(
-      new AppError(
-        "Failed to find departments: No data returned from search:",
-        500
-      )
+      new AppError("No data returned from search:")
     );
   });
 });

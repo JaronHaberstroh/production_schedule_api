@@ -1,44 +1,44 @@
 // @vitest-environment express
 
+import updateDepartment from "../updateDepartment.js";
 import updateDocumment from "#controllers/utils/updateDocument.js";
 import AppError from "#utils/appError.js";
-import updateDepartment from "../updateDepartment.js";
+import mongoose from "mongoose";
 
-const returnValues = {
-  success: true,
-  message: "failed message",
-};
+// Mock updateDocument function
+vi.mock("#controllers/utils/updateDocument.js", () => ({ default: vi.fn() }));
 
-vi.mock("#controllers/utils/updateDocument.js", () => {
-  return {
-    default: vi.fn((model, data) => {
-      return {
-        ...returnValues,
-        model,
-        data,
-      };
-    }),
+describe("Update department controller", () => {
+  // Setup test Variables
+  const mockUpdateDocumentSuccess = {
+    success: true,
+    message: "test message",
+    data: { departmentName: "test" },
+    error: null,
   };
-});
 
-describe("update department controller", () => {
-  let testData;
+  const mockUpdateDocumentError = {
+    success: false,
+    message: "fail message",
+    data: null,
+    error: new AppError(),
+  };
+
   beforeAll(() => {
-    // Set test variables
-    testData = { _id: "testing", departmentName: "test Department" };
-    mockReq = {
-      body: { departmentName: testData.departmentName },
-      params: { _id: testData._id },
-    };
+    mockReq.body = { departmentName: "testDepartment" };
+    mockReq.params = { _id: new mongoose.Types.ObjectId() };
   });
 
   beforeEach(() => {
     // Reset test variables
-    mockReq.body = { departmentName: testData.departmentName };
-    mockReq.params = { _id: testData._id };
+    mockReq.body = { departmentName: "testDepartment" };
+    mockReq.params = { _id: new mongoose.Types.ObjectId() };
   });
 
   test("should return success response when successful", async () => {
+    // Mock return value for successful operation
+    updateDocumment.mockResolvedValue(mockUpdateDocumentSuccess);
+
     // Call update department controller
     await updateDepartment(mockReq, mockRes, mockNext);
 
@@ -47,51 +47,42 @@ describe("update department controller", () => {
     expect(mockRes.json).toBeCalled();
   });
 
-  test("should throw error if _id not provided", async () => {
-    // Alter test variables to force error
+  test("should pass error to next if unsuccessful", async () => {
+    // Mock return value for unsuccessful operation
+    updateDocumment.mockResolvedValue(mockUpdateDocumentError);
+
+    // Call update department controller
+    await updateDepartment(mockReq, mockRes, mockNext);
+
+    // Expect Error to be passed to next
+    await expect(mockNext).toBeCalledWith(
+      new AppError(
+        `Error while updating Department document: ${mockUpdateDocumentError.message}`
+      )
+    );
+  });
+
+  test("should pass error to next if _id not provided", async () => {
+    // Alter _id to simulate missing _id param
     mockReq.params._id = "";
 
     // Call update department controller
     await updateDepartment(mockReq, mockRes, mockNext);
 
-    // Expect Error be thrown
-    expect(mockNext).toBeCalledWith(
-      new AppError("Failed to update document: Department id is required", 404)
-    );
+    // Expect Error to be passed to next
+    expect(mockNext).toBeCalledWith(new AppError("Department id is required"));
   });
 
-  test("should throw error if params not provided", async () => {
-    // Alter test variables to force error
+  test("should pass error to next if params not provided", async () => {
+    // Alter body to simulate missing body params
     mockReq.body = "";
 
     // Call update department controller
     await updateDepartment(mockReq, mockRes, mockNext);
 
-    // Expect Error to be thrown
+    // Expect Error to be passed to next
     expect(mockNext).toBeCalledWith(
-      new AppError(
-        "Failed to update document: Update requires changed properties be provided",
-        404
-      )
-    );
-  });
-
-  test("should throw error when success false", async () => {
-    // Alter test variables to force error
-    updateDocumment.mockReturnValue({
-      ...returnValues,
-      success: false,
-    });
-
-    // Call update department controller
-    await updateDepartment(mockReq, mockRes, mockNext);
-
-    // Expect Error to be thrown
-    await expect(mockNext).toBeCalledWith(
-      new AppError(
-        "Failed to update document: Document was not updated successfully: failed message",
-        500
-      )
+      new AppError("Update requires changed properties be provided")
     );
   });
 });

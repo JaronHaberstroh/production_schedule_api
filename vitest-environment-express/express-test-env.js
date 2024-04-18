@@ -3,10 +3,10 @@ export default {
   transformMode: "ssr",
   async setup() {
     // Create mocks for Express objects and functions
-    const mockReq = {};
+    const mockReq = { body: {}, params: {} };
     const mockRes = {
       status: vi.fn(() => mockRes),
-      json: vi.fn(),
+      json: vi.fn(() => mockRes),
       headersSent: false,
     };
     const mockNext = vi.fn();

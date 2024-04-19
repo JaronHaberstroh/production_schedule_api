@@ -4,18 +4,16 @@ import request from "supertest";
 import app from "./src/app.js";
 import Department from "#models/department.js";
 import mongoose from "mongoose";
+import { expect } from "node_modules/vitest/dist/index.js";
 
 describe("Department Routes", () => {
-  let testDepartments;
-  beforeAll(async () => {
-    // Set test variables
-    testDepartments = [
-      { departmentName: "test" },
-      { departmentName: "test2" },
-      { departmentName: "test3" },
-      { departmentName: "test4" },
-    ];
-  });
+  // Set test variables
+  const testDepartments = [
+    { departmentName: "test" },
+    { departmentName: "test2" },
+    { departmentName: "test3" },
+    { departmentName: "test4" },
+  ];
 
   beforeEach(async () => {
     // Populate Department collection
@@ -28,148 +26,141 @@ describe("Department Routes", () => {
   });
 
   describe("POST /api/department/post", () => {
-    test("should return success response", async () => {
-      // Make request to endpoint
-      const response = await request(app)
-        .post("/api/department/create")
-        .send({ departmentName: "testing" });
+    const route = "/api/department/create";
+    test("should create a new department successfully", async () => {
+      const newDepartment = { departmentName: "testing" };
 
-      // Expect success response
+      const response = await request(app).post(route).send(newDepartment);
+      const resBody = response._body;
+
+      const result = await Department.findOne(newDepartment);
+
       expect(response.statusCode).toBe(201);
+      expect(result.departmentName).toBe(newDepartment.departmentName);
+      expect(resBody.data._id).toBeTruthy();
     });
 
-    test("should return failure response", async () => {
-      // Make request to endpoint
-      const response = await request(app).post("/api/department/create");
+    test("should fail to create new deparment when missing params", async () => {
+      const response = await request(app).post(route);
 
-      // Expect fail response
+      const resBody = response._body;
+
       expect(response.statusCode).toBe(400);
+      expect(resBody.message).toContain("Validation Error");
     });
   });
 
   describe("GET /api/department/read", () => {
-    // Set test variables
     const route = "/api/department/read";
-    test("should return success response", async () => {
-      // Make request to endpoint
+    test("should find all departments", async () => {
       const response = await request(app).get(route);
 
-      // Expect success response
+      const resBody = response._body;
+
       expect(response.statusCode).toBe(200);
+      expect(resBody.data.length).toBe(4);
     });
 
-    test("should return failure response", async () => {
-      // Empty department collection
+    test("should fail to find departments if non exist", async () => {
+      // Empty department collection to force fail to find
       await Department.deleteMany();
 
-      // Make request to endpoint
       const response = await request(app).get(route);
+      const resBody = response._body;
 
-      // Expect not found response
       expect(response.statusCode).toBe(404);
+      expect(resBody.message).toContain("Error");
     });
   });
 
   describe("GET /api/department/read/:_id", () => {
-    // Set test variables
     const route = "/api/department/read/";
-    test("should return success response", async () => {
-      // Find DB items
-      const result = await Department.find();
+    test("should find department matching given _id", async () => {
+      const department = await Department.findOne();
 
-      // Set query
-      const query = result[0]._id.toString();
+      const response = await request(app).get(`${route}${department._id}`);
+      const resBody = response._body;
 
-      // Make request to endpoint
-      const response = await request(app).get(`${route}${query}`);
-
-      // Expect success response
       expect(response.statusCode).toBe(200);
+      expect(resBody.data[0].departmentName).toBe(department.departmentName);
     });
 
-    test("should return failure response if invalid _id provided", async () => {
-      // Set query
+    test("should fail to find departments if invalid _id provided", async () => {
       const query = new mongoose.Types.ObjectId();
 
-      // Make request to endpoint
       const response = await request(app).get(`${route}${query}`);
+      const resBody = response._body;
 
-      expect(response.statusCode).toBe(404);
+      expect(response.statusCode).toBe(400);
+      expect(resBody.message).toContain("Validation Error");
     });
   });
 
-  describe("POST /api/department/update/:_id", () => {
-    // Set test variables
+  describe("POST /api/department/update/:_id", async () => {
     const route = "/api/department/update/";
-    let result, query, params;
-    beforeEach(async () => {
-      // Find DB items
-      result = await Department.find();
 
-      // Set query
-      query = result[0]._id.toString();
+    const params = { departmentName: "starship construction" };
 
-      // Set params
-      params = { departmentName: "starship construction" };
-    });
+    test("should successfully update department document", async () => {
+      const department = await Department.findOne();
 
-    test("should return success response", async () => {
-      // Make request to endpoint
       const response = await request(app)
-        .patch(`${route}${query}`)
+        .patch(`${route}${department._id}`)
         .send(params);
 
-      // Expect success response
+      const result = await Department.findOne({ _id: department._id });
+
       expect(response.statusCode).toBe(200);
+      expect(result.departmentName).toBe(params.departmentName);
     });
 
-    test("should return error if params not provided", async () => {
-      // Make request to endpoint
-      const response = await request(app).patch(`${route}${query}`).send();
+    test("should fail to update department document if params not provided", async () => {
+      const department = await Department.findOne();
 
-      // Expect failure response
+      const response = await request(app)
+        .patch(`${route}${department._id}`)
+        .send();
+      const resBody = response._body;
+
       expect(response.statusCode).toBe(400);
+      expect(resBody.message).toContain("Validation Error");
     });
 
-    test("should fail if invalid _id provided", async () => {
-      // Set query
-      query = new mongoose.Types.ObjectId();
+    test("should fail to update department document if invalid provided", async () => {
+      const query = new mongoose.Types.ObjectId();
 
       const response = await request(app)
         .patch(`${route}${query}`)
         .send(params);
+      const resBody = response._body;
 
-      expect(response.statusCode).toBe(404);
+      expect(response.statusCode).toBe(400);
+      expect(resBody.message).toContain("Validation Error");
     });
   });
 
   describe("DELETE /api/department/delete/:_id", () => {
-    // Set test variables
     const route = "/api/department/delete/";
-    let result, query;
-    beforeEach(async () => {
-      // Find DB items
-      result = await Department.find();
 
-      // Set query
-      query = result[0]._id.toString();
-    });
+    test("should successfully delete department", async () => {
+      const department = await Department.findOne();
 
-    test("should return success response", async () => {
-      // Make request to endpoint
-      const response = await request(app).delete(`${route}${query}`);
+      const response = await request(app).delete(`${route}${department._id}`);
+
+      const result = await Department.findOne({ _id: department._id });
 
       expect(response.statusCode).toBe(200);
+      expect(result).toBe(null);
     });
 
-    test("should fail if _id not found", async () => {
-      // Set query
-      query = new mongoose.Types.ObjectId();
+    test("should fail to delete department if _id not found", async () => {
+      const query = new mongoose.Types.ObjectId();
 
-      // Make request to endpoint
       const response = await request(app).delete(`${route}${query}`);
+      const resBody = response._body;
 
-      expect(response.statusCode).toBe(404);
+      expect(response.statusCode).toBe(400);
+      expect(resBody.message).toContain("Validation Error");
     });
   });
 });

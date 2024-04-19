@@ -38,7 +38,7 @@ const handleResult = (next, res, result) => {
 
   res
     .status(200)
-    .json(successResponse(result.message, result.statusCode, result));
+    .json(successResponse(result.message, result.statusCode, result.data));
 };
 
 export default updateDepartment;

@@ -33,7 +33,7 @@ const handleResult = (res, result) => {
 
   res
     .status(201)
-    .json(successResponse(result.message, result.statusCode, result));
+    .json(successResponse(result.message, result.statusCode, result.data));
 };
 
 export default createDepartment;

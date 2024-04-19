@@ -1,4 +1,5 @@
 import Department from "#models/department.js";
+import { errorResponse } from "#responses/response.js";
 import { param, body, validationResult } from "express-validator";
 
 const validate = (req, res, next) => {
@@ -8,9 +9,10 @@ const validate = (req, res, next) => {
     const extractedErrors = JSON.stringify(
       errors.array().map((err) => ({ [err.path]: err.msg }))
     );
-    return res.status(400).json(`Validation Error: ${extractedErrors}`, 400);
+    return res
+      .status(400)
+      .json(errorResponse(`Validation Error: ${extractedErrors}`, 400));
   }
-
   next();
 };
 

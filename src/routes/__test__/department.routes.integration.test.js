@@ -31,7 +31,7 @@ describe("Department Routes", () => {
       const newDepartment = { departmentName: "testing" };
 
       const response = await request(app).post(route).send(newDepartment);
-      const resBody = response._body;
+      const resBody = response.body;
 
       const result = await Department.findOne(newDepartment);
 
@@ -43,7 +43,7 @@ describe("Department Routes", () => {
     test("should fail to create new deparment when missing params", async () => {
       const response = await request(app).post(route);
 
-      const resBody = response._body;
+      const resBody = response.body;
 
       expect(response.statusCode).toBe(400);
       expect(resBody.message).toContain("Validation Error");
@@ -55,7 +55,7 @@ describe("Department Routes", () => {
     test("should find all departments", async () => {
       const response = await request(app).get(route);
 
-      const resBody = response._body;
+      const resBody = response.body;
 
       expect(response.statusCode).toBe(200);
       expect(resBody.data.length).toBe(4);
@@ -66,30 +66,30 @@ describe("Department Routes", () => {
       await Department.deleteMany();
 
       const response = await request(app).get(route);
-      const resBody = response._body;
+      const resBody = response.body;
 
       expect(response.statusCode).toBe(404);
       expect(resBody.message).toContain("Error");
     });
   });
 
-  describe("GET /api/department/read/:_id", () => {
+  describe("GET /api/department/read/:id", () => {
     const route = "/api/department/read/";
-    test("should find department matching given _id", async () => {
+    test("should find department matching given id", async () => {
       const department = await Department.findOne();
 
-      const response = await request(app).get(`${route}${department._id}`);
-      const resBody = response._body;
+      const response = await request(app).get(`${route}${department.id}`);
+      const resBody = response.body;
 
       expect(response.statusCode).toBe(200);
       expect(resBody.data[0].departmentName).toBe(department.departmentName);
     });
 
-    test("should fail to find departments if invalid _id provided", async () => {
+    test("should fail to find departments if invalid id provided", async () => {
       const query = new mongoose.Types.ObjectId();
 
       const response = await request(app).get(`${route}${query}`);
-      const resBody = response._body;
+      const resBody = response.body;
 
       expect(response.statusCode).toBe(400);
       expect(resBody.message).toContain("Validation Error");
@@ -105,10 +105,10 @@ describe("Department Routes", () => {
       const department = await Department.findOne();
 
       const response = await request(app)
-        .patch(`${route}${department._id}`)
+        .patch(`${route}${department.id}`)
         .send(params);
 
-      const result = await Department.findOne({ _id: department._id });
+      const result = await Department.findOne({ _id: department.id });
 
       expect(response.statusCode).toBe(200);
       expect(result.departmentName).toBe(params.departmentName);
@@ -118,9 +118,9 @@ describe("Department Routes", () => {
       const department = await Department.findOne();
 
       const response = await request(app)
-        .patch(`${route}${department._id}`)
+        .patch(`${route}${department.id}`)
         .send();
-      const resBody = response._body;
+      const resBody = response.body;
 
       expect(response.statusCode).toBe(400);
       expect(resBody.message).toContain("Validation Error");
@@ -132,7 +132,7 @@ describe("Department Routes", () => {
       const response = await request(app)
         .patch(`${route}${query}`)
         .send(params);
-      const resBody = response._body;
+      const resBody = response.body;
 
       expect(response.statusCode).toBe(400);
       expect(resBody.message).toContain("Validation Error");
@@ -145,19 +145,19 @@ describe("Department Routes", () => {
     test("should successfully delete department", async () => {
       const department = await Department.findOne();
 
-      const response = await request(app).delete(`${route}${department._id}`);
+      const response = await request(app).delete(`${route}${department.id}`);
 
-      const result = await Department.findOne({ _id: department._id });
+      const result = await Department.findOne({ _id: department.id });
 
       expect(response.statusCode).toBe(200);
       expect(result).toBe(null);
     });
 
-    test("should fail to delete department if _id not found", async () => {
+    test("should fail to delete department if id not found", async () => {
       const query = new mongoose.Types.ObjectId();
 
       const response = await request(app).delete(`${route}${query}`);
-      const resBody = response._body;
+      const resBody = response.body;
 
       expect(response.statusCode).toBe(400);
       expect(resBody.message).toContain("Validation Error");

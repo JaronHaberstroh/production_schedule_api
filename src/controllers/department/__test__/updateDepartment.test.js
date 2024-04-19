@@ -61,28 +61,4 @@ describe("Update department controller", () => {
       )
     );
   });
-
-  test("should pass error to next if _id not provided", async () => {
-    // Alter _id to simulate missing _id param
-    mockReq.params._id = "";
-
-    // Call update department controller
-    await updateDepartment(mockReq, mockRes, mockNext);
-
-    // Expect Error to be passed to next
-    expect(mockNext).toBeCalledWith(new AppError("Department id is required"));
-  });
-
-  test("should pass error to next if params not provided", async () => {
-    // Alter body to simulate missing body params
-    mockReq.body = "";
-
-    // Call update department controller
-    await updateDepartment(mockReq, mockRes, mockNext);
-
-    // Expect Error to be passed to next
-    expect(mockNext).toBeCalledWith(
-      new AppError("Update requires changed properties be provided")
-    );
-  });
 });

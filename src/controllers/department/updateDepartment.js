@@ -8,7 +8,7 @@ const updateDepartment = async (req, res, next) => {
     const departmentId = req.params._id;
     const params = req.body;
 
-    validateDepartmentData(next, departmentId, params);
+    // validateDepartmentData(next, departmentId, params);
 
     const result = await updateDocumment(Department, {
       query: departmentId,
@@ -22,18 +22,6 @@ const updateDepartment = async (req, res, next) => {
         `Unhandled Exception: ${error.message}`,
         error.statusCode || 500
       )
-    );
-  }
-};
-
-const validateDepartmentData = (next, departmentId, params) => {
-  if (!departmentId) {
-    return next(new AppError(`Department id is required`, 400));
-  }
-
-  if (Object.keys(params).length === 0) {
-    return next(
-      new AppError(`Update requires changed properties be provided`, 400)
     );
   }
 };

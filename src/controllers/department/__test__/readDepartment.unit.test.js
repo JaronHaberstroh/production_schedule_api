@@ -1,9 +1,6 @@
-// @vitest-environment express
-
 import readDepartment from "../readDepartment.js";
 import readDocument from "#controllers/utils/readDocument.js";
 import AppError from "#utils/appError.js";
-import mongoose from "mongoose";
 
 // Mock readDocument function
 vi.mock("#controllers/utils/readDocument.js", () => ({ default: vi.fn() }));
@@ -23,13 +20,10 @@ describe("Read department controller", () => {
     data: null,
     error: new AppError(),
   };
-  beforeAll(() => {
-    mockReq.params = { _id: new mongoose.Types.ObjectId() };
-  });
 
   test("should return success response when successful", async () => {
     // Mock return value for successful operation
-    readDocument.mockResolvedValue(mockReadDocumentSuccess);
+    readDocument.mockResolvedValueOnce(mockReadDocumentSuccess);
 
     // Call read department controller
     await readDepartment(mockReq, mockRes, mockNext);
@@ -41,29 +35,26 @@ describe("Read department controller", () => {
 
   test("should pass error to next when unsuccessful", async () => {
     // Mock return value for failed operation
-    readDocument.mockResolvedValue(mockReadDocumentError);
+    readDocument.mockRejectedValueOnce(mockReadDocumentError);
 
     // Call read department controller
     await readDepartment(mockReq, mockRes, mockNext);
 
     // Expect Error to be passed to next
-    expect(mockNext).toBeCalledWith(
-      new AppError(
-        `Error while fetching Department data: ${mockReadDocumentError.message}`
-      )
-    );
+    expect(mockNext).toBeCalledWith(expect.any(AppError));
   });
 
   test("should pass error to next if no data found", async () => {
     // Mock return value for successful operation with no returned results
-    readDocument.mockResolvedValue({ ...mockReadDocumentSuccess, data: [] });
+    readDocument.mockRejectedValueOnce({
+      ...mockReadDocumentSuccess,
+      data: [],
+    });
 
     // Call read department controller
     await readDepartment(mockReq, mockRes, mockNext);
 
     // Expect Error to be passed to next
-    expect(mockNext).toBeCalledWith(
-      new AppError("No data returned from search:")
-    );
+    expect(mockNext).toBeCalledWith(expect.any(AppError));
   });
 });

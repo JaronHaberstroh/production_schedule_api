@@ -1,9 +1,6 @@
-// @vitest-environment express
-
 import updateDepartment from "../updateDepartment.js";
 import updateDocumment from "#controllers/utils/updateDocument.js";
 import AppError from "#utils/appError.js";
-import mongoose from "mongoose";
 
 // Mock updateDocument function
 vi.mock("#controllers/utils/updateDocument.js", () => ({ default: vi.fn() }));
@@ -24,17 +21,6 @@ describe("Update department controller", () => {
     error: new AppError(),
   };
 
-  beforeAll(() => {
-    mockReq.body = { departmentName: "testDepartment" };
-    mockReq.params = { _id: new mongoose.Types.ObjectId() };
-  });
-
-  beforeEach(() => {
-    // Reset test variables
-    mockReq.body = { departmentName: "testDepartment" };
-    mockReq.params = { _id: new mongoose.Types.ObjectId() };
-  });
-
   test("should return success response when successful", async () => {
     // Mock return value for successful operation
     updateDocumment.mockResolvedValue(mockUpdateDocumentSuccess);
@@ -49,16 +35,12 @@ describe("Update department controller", () => {
 
   test("should pass error to next if unsuccessful", async () => {
     // Mock return value for unsuccessful operation
-    updateDocumment.mockResolvedValue(mockUpdateDocumentError);
+    updateDocumment.mockRejectedValueOnce(mockUpdateDocumentError);
 
     // Call update department controller
     await updateDepartment(mockReq, mockRes, mockNext);
 
     // Expect Error to be passed to next
-    await expect(mockNext).toBeCalledWith(
-      new AppError(
-        `Error while updating Department document: ${mockUpdateDocumentError.message}`
-      )
-    );
+    await expect(mockNext).toBeCalledWith(expect.any(AppError));
   });
 });

@@ -1,5 +1,3 @@
-// @vitest-environment integration
-
 import request from "supertest";
 import app from "./src/app.js";
 import Department from "#models/department.js";

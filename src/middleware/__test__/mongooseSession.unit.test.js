@@ -1,8 +1,6 @@
-// @vitest-environment express
-
 import mongooseSession from "../mongooseSession.js";
 import AppError from "#utils/appError.js";
-import mongoose, { startSession } from "mongoose";
+import mongoose from "mongoose";
 
 vi.mock("mongoose", () => ({
   default: {

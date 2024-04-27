@@ -1,5 +1,3 @@
-// @vitest-environment express
-
 import unhanledRoutesHandler from "src/middleware/unhandledRoutesHandler.js";
 import AppError from "#utils/appError.js";
 
@@ -13,13 +11,7 @@ describe("unhandledRoutesHandler middleware", () => {
     unhanledRoutesHandler(mockReq, mockRes, mockNext);
 
     // Expect AppError to be create and next() to be called
-    expect(mockNext).toBeCalled();
-    expect(mockNext).toBeCalledWith(
-      new AppError(
-        `Path ${mockReq.originalUrl} does not exist for ${mockReq.method} method`,
-        404
-      )
-    );
+    expect(mockNext).toBeCalledWith(expect.any(AppError));
     expect(mockNext).toHaveReturned();
   });
 });

@@ -1,5 +1,3 @@
-// @vitest-environment express
-
 import errorHandler from "src/middleware/errorHandler.js";
 
 describe("errroHandler middleware", () => {
@@ -20,8 +18,10 @@ describe("errroHandler middleware", () => {
   test("should do nothing if res.headerSent is true", () => {
     mockRes.headerSent = true;
 
+    // Call errorHandler
     errorHandler(mockError, mockReq, mockRes, mockNext);
 
+    // Expect next to be called
     expect(mockNext).toBeCalledWith(mockError);
   });
 
@@ -32,8 +32,8 @@ describe("errroHandler middleware", () => {
     // Expect res to contain all info for client
     expect(mockRes.status).toBeCalledWith(404);
     expect(mockRes.json).toBeCalledWith({
-      status: 404,
-      message: "test message",
+      status: mockError.statusCode,
+      message: mockError.message,
       stack: mockError.stack,
     });
   });

@@ -14,5 +14,9 @@ export default defineConfig({
         singleFork: true,
       },
     },
+    environmentMatchGlobs: [
+      ["src/**/*unit.test.js", "unit"],
+      ["src/**/*integration.test.js", "integration"],
+    ],
   },
 });

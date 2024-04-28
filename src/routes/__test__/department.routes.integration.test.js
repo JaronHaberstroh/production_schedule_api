@@ -13,6 +13,8 @@ describe("Department Routes", () => {
     { departmentName: "test4" },
   ];
 
+  const route = "/api/departments/";
+
   beforeEach(async () => {
     // Populate Department collection
     await Department.insertMany(testDepartments);
@@ -24,7 +26,6 @@ describe("Department Routes", () => {
   });
 
   describe("POST /api/department/post", () => {
-    const route = "/api/department/create";
     test("should create a new department successfully", async () => {
       const newDepartment = { departmentName: "testing" };
 
@@ -49,7 +50,6 @@ describe("Department Routes", () => {
   });
 
   describe("GET /api/department/read", () => {
-    const route = "/api/department/read";
     test("should find all departments", async () => {
       const response = await request(app).get(route);
 
@@ -72,7 +72,6 @@ describe("Department Routes", () => {
   });
 
   describe("GET /api/department/read/:id", () => {
-    const route = "/api/department/read/";
     test("should find department matching given id", async () => {
       const department = await Department.findOne();
 
@@ -95,8 +94,6 @@ describe("Department Routes", () => {
   });
 
   describe("POST /api/department/update/:_id", async () => {
-    const route = "/api/department/update/";
-
     const params = { departmentName: "starship construction" };
 
     test("should successfully update department document", async () => {
@@ -138,8 +135,6 @@ describe("Department Routes", () => {
   });
 
   describe("DELETE /api/department/delete/:_id", () => {
-    const route = "/api/department/delete/";
-
     test("should successfully delete department", async () => {
       const department = await Department.findOne();
 

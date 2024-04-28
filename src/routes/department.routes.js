@@ -14,7 +14,7 @@ router.post("/", departmentNameValidator(), validate, createDepartment);
 
 router.get("/:_id", departmentIdValidator(), validate, readDepartment);
 
-router.get("/", departmentNameValidator(), readDepartment);
+router.get("/", readDepartment);
 
 router.patch(
   "/:_id",

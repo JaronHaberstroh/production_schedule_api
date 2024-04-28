@@ -5,19 +5,12 @@ import mongoose from "mongoose";
 import { expect } from "node_modules/vitest/dist/index.js";
 
 describe("Department Routes", () => {
-  // Set test variables
-  const testDepartments = [
-    { departmentName: "test" },
-    { departmentName: "test2" },
-    { departmentName: "test3" },
-    { departmentName: "test4" },
-  ];
-
   const route = "/api/departments/";
 
   beforeEach(async () => {
-    // Populate Department collection
-    await Department.insertMany(testDepartments);
+    // Seed DB
+    const seedParams = { Department };
+    seedDB(seedParams);
   });
 
   afterEach(async () => {
@@ -56,7 +49,7 @@ describe("Department Routes", () => {
       const resBody = response.body;
 
       expect(response.statusCode).toBe(200);
-      expect(resBody.data.length).toBe(4);
+      expect(resBody.data.length).toBe(5);
     });
 
     test("should fail to find departments if non exist", async () => {

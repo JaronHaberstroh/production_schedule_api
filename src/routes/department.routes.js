@@ -10,25 +10,20 @@ import validate, {
 
 const router = Router();
 
-router.post("/create", departmentNameValidator(), validate, createDepartment);
+router.post("/", departmentNameValidator(), validate, createDepartment);
 
-router.get("/read/:_id", departmentIdValidator(), validate, readDepartment);
+router.get("/:_id", departmentIdValidator(), validate, readDepartment);
 
-router.get("/read", departmentNameValidator(), readDepartment);
+router.get("/", departmentNameValidator(), readDepartment);
 
 router.patch(
-  "/update/:_id",
+  "/:_id",
   departmentNameValidator(),
   departmentIdValidator(),
   validate,
   updateDepartment
 );
 
-router.delete(
-  "/delete/:_id",
-  departmentIdValidator(),
-  validate,
-  deleteDepartment
-);
+router.delete("/:_id", departmentIdValidator(), validate, deleteDepartment);
 
 export default router;

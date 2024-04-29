@@ -1,5 +1,3 @@
-// @vitest-environment mongoose
-
 import readDocument from "../readDocument.js";
 
 describe("readDocument()", () => {

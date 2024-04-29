@@ -1,5 +1,3 @@
-// @vitest-environment mongoose
-
 import updateDocumment from "../updateDocument.js";
 
 describe("updateDocument()", () => {

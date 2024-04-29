@@ -1,5 +1,3 @@
-// @vitest-environment mongoose
-
 import deleteDocument from "../deleteDocument.js";
 
 describe("deleteDocument()", () => {

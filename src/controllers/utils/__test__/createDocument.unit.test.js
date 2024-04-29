@@ -1,5 +1,3 @@
-// @vitest-environment mongoose
-
 import createDocument from "../createDocument.js";
 
 describe("createDocumnet()", () => {

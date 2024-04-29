@@ -1,5 +1,3 @@
-// @vitest-environment mongoose
-
 import Department from "#models/department.js";
 import ProductionLine from "#models/productionLine.js";
 import mongoose from "mongoose";

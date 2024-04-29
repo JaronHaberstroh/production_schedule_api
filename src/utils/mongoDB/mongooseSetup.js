@@ -1,9 +1,9 @@
-import { MongoMemoryServer } from "mongodb-memory-server";
+import { MongoMemoryReplSet } from "mongodb-memory-server";
 import mongoose from "mongoose";
 
 const connectDB = async () => {
   // Init mongoServer variable
-  let mongoServer = null;
+  let mongoReplSet = null;
 
   try {
     // Init dbUrl variable and set it to .env value
@@ -12,17 +12,19 @@ const connectDB = async () => {
     // Check if running tests
     if (process.env.NODE_ENV === "test") {
       // Create memory server for running tests
-      mongoServer = await MongoMemoryServer.create();
+      mongoReplSet = await MongoMemoryReplSet.create({
+        replSet: { count: 3, storageEngine: "wiredTiger" },
+      });
 
       // Change dbUrl variable to memory server URI
-      mongoUrl = mongoServer.getUri();
+      mongoUrl = mongoReplSet.getUri();
     }
 
     // Create connection to mongoose
     const mongoConnection = await mongoose.connect(mongoUrl, {});
 
     // Return variables
-    return { mongoConnection, mongoServer, mongoUrl };
+    return { mongoConnection, mongoReplSet, mongoUrl };
   } catch (error) {
     // Handle errors
     console.error("Issue with connecting to DB", error);

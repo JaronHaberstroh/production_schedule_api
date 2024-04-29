@@ -4,31 +4,31 @@ import { connectDB, disconnectDB } from "#mongoDB/mongooseSetup.js";
 
 describe("Database connect/disconnect functions", () => {
   // Init mongoDB variables
-  let mongoConnection, mongoServer;
+  let mongoConnection, mongoReplSet;
 
   beforeAll(async () => {
     // Connect to mongoDB
-    ({ mongoConnection, mongoServer } = await connectDB());
+    ({ mongoConnection, mongoReplSet } = await connectDB());
   });
 
   afterAll(async () => {
     // Disconnect from mongoDB
-    await disconnectDB(mongoConnection, mongoServer);
+    await disconnectDB(mongoConnection, mongoReplSet);
   });
 
   test("ConnectDB() should connect to mongod", () => {
     // Expect connection to be made
     expect(mongoConnection).toBeDefined();
-    expect(mongoServer._instanceInfo).toBeTruthy();
+    expect(mongoReplSet._state).toBe("running");
     expect(mongoose.connection.readyState).toBe(1);
   });
 
   test("DisconectDB() should disconnect from mongod", async () => {
     // Disconnect from DB
-    await disconnectDB(mongoConnection, mongoServer);
+    await disconnectDB(mongoConnection, mongoReplSet);
 
     // Expect connection to be undefined after disconnect
-    expect(mongoServer._instanceInfo).toBe(undefined);
+    expect(mongoReplSet._state).toBe("stopped");
     expect(mongoose.connection.readyState).toBe(0);
   });
 });

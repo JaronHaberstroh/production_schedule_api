@@ -14,7 +14,7 @@ describe("Create productionLine controller", () => {
 
   beforeEach(async () => {
     mockReq = {
-      params: { departmentId: department._id },
+      params: { departmentId: department.id },
       body: { lineName: "Test Line" },
       session: await mongoose.startSession(),
     };

@@ -2,7 +2,6 @@ import request from "supertest";
 import app from "./src/app.js";
 import Department from "#models/department.js";
 import mongoose from "mongoose";
-import { expect } from "node_modules/vitest/dist/index.js";
 
 describe("Department Routes", () => {
   const route = "/api/departments/";
@@ -18,7 +17,7 @@ describe("Department Routes", () => {
     await Department.deleteMany();
   });
 
-  describe("POST /api/department/post", () => {
+  describe("POST /api/department/", () => {
     test("should create a new department successfully", async () => {
       const newDepartment = { departmentName: "testing" };
 
@@ -42,7 +41,7 @@ describe("Department Routes", () => {
     });
   });
 
-  describe("GET /api/department/read", () => {
+  describe("GET /api/department/", () => {
     test("should find all departments", async () => {
       const response = await request(app).get(route);
 
@@ -64,7 +63,7 @@ describe("Department Routes", () => {
     });
   });
 
-  describe("GET /api/department/read/:id", () => {
+  describe("GET /api/department/:id", () => {
     test("should find department matching given id", async () => {
       const department = await Department.findOne();
 
@@ -86,7 +85,7 @@ describe("Department Routes", () => {
     });
   });
 
-  describe("POST /api/department/update/:_id", async () => {
+  describe("POST /api/department/:_id", async () => {
     const params = { departmentName: "starship construction" };
 
     test("should successfully update department document", async () => {
@@ -127,7 +126,7 @@ describe("Department Routes", () => {
     });
   });
 
-  describe("DELETE /api/department/delete/:_id", () => {
+  describe("DELETE /api/department/:_id", () => {
     test("should successfully delete department", async () => {
       const department = await Department.findOne();
 

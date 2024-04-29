@@ -9,7 +9,8 @@
             "#controllers/*": ["./src/controllers/*"],
             "#models/*": ["./src/models/*"],
             "#routes/*": ["./src/models/*"],
-            "#responses/*": ["./src/responses/*"]
+            "#responses/*": ["./src/responses/*"],
+            "#middleware/*": ["./src/middleware/*"]
         }
     },
     "exclude": ["node_modules"]

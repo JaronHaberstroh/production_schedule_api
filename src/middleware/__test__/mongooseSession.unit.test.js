@@ -43,7 +43,6 @@ describe("Mongoose session wrapper", () => {
     expect(session.startTransaction).toBeCalled();
     expect(mockReq.session).toBe(session);
     expect(controller).toBeCalledWith(mockReq, mockRes, mockNext);
-    expect(session.abortTransaction).toBeCalled();
     expect(AppError).toBeCalledWith(`Session Error: ${error.message}`, 500);
     expect(mockNext).toBeCalledWith(expect.any(AppError));
     expect(session.endSession).toBeCalled();

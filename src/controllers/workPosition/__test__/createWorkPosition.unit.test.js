@@ -1,4 +1,4 @@
-import createWorkPosition from "../createworkPosition.js";
+import createWorkPosition from "../createWorkPosition.js";
 import createDocument from "#controllers/utils/createDocument.js";
 import AppError from "#utils/appError.js";
 

@@ -7,6 +7,6 @@ const router = Router();
 
 router.use("/departments", departmentRoutes);
 router.use("/departments", productionLineRoutes);
-router.use("/work-postions", workPositionRoutes);
+router.use("/work-positions", workPositionRoutes);
 
 export default router;

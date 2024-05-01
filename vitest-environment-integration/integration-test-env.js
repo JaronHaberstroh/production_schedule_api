@@ -16,6 +16,9 @@ export default {
 
     return {
       async teardown() {
+        // Drop DB
+        await mongoose.connection.db.dropDatabase();
+
         // Disconnect from DB
         disconnectDB(mongoConnection, mongoReplSet);
       },

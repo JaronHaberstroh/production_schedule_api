@@ -6,10 +6,10 @@ export default {
   transformMode: "ssr",
   async setup() {
     // Init DB variables
-    let mongoConnection, mongoServer;
+    let mongoConnection, mongoReplSet;
 
     // Connect to DB
-    ({ mongoConnection, mongoServer } = await connectDB());
+    ({ mongoConnection, mongoReplSet } = await connectDB());
 
     // Create mocks for Express objects and functions
     const mockReq = { body: {}, params: {}, session: {} };
@@ -30,7 +30,7 @@ export default {
     return {
       async teardown() {
         // Disconnect from DB
-        disconnectDB(mongoConnection, mongoServer);
+        await disconnectDB(mongoConnection, mongoReplSet);
       },
     };
   },

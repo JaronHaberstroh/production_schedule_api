@@ -9,6 +9,10 @@ describe("Work position model", () => {
     };
   });
 
+  afterAll(async () => {
+    await WorkPosition.deleteMany();
+  });
+
   test("should create and save work position successfully", async () => {
     const validPosition = new WorkPosition(testData);
 

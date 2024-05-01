@@ -9,6 +9,10 @@ describe("Department Model", () => {
     };
   });
 
+  afterAll(async () => {
+    await Department.deleteMany();
+  });
+
   test("should create and save department successfully", async () => {
     // Create valid department
     const validDepartment = new Department(testData);

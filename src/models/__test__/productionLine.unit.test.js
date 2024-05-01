@@ -27,6 +27,11 @@ describe("ProductionLine model", () => {
     }
   });
 
+  afterAll(async () => {
+    await Department.deleteMany();
+    await ProductionLine.deleteMany();
+  });
+
   test("should create and save production lines successfully", async () => {
     const validProductionLine = new ProductionLine(testData[0]);
 

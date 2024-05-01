@@ -58,7 +58,7 @@ const seedDB = async (req, res, next) => {
 const dropDB = async (req, res, next) => {
   try {
     await mongoose.connection.db.dropDatabase();
-    res.status(200).json(successResponse("DB drop completed", 201));
+    res.status(200).json(successResponse("DB drop completed", 200));
   } catch (error) {
     const err = new AppError(`Error while dropping DB; ${error.message}`, 500);
     return next(err);

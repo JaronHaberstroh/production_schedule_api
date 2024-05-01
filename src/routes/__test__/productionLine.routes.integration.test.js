@@ -6,21 +6,18 @@ describe("Production line routes", () => {
   let route;
 
   beforeEach(async () => {
-    const result = await request(app).post("/api/test/seedDB");
-    console.log(result.body.message);
+    await request(app).post("/api/test/seedDB");
 
     const department = await Department.findOne();
     route = `/api/departments/${department.id}/production-lines/`;
   });
 
   afterEach(async () => {
-    const result = await request(app).delete("/api/test/dropDB");
-    console.log(result.body.message);
+    await request(app).delete("/api/test/dropDB");
   });
 
   afterAll(async () => {
-    const result = await request(app).delete("/api/test/dropDB");
-    console.log("DropDB after all tests finish", result.body.message);
+    await request(app).delete("/api/test/dropDB");
   });
 
   test("should create a new productionLine and update it's department productionLine list", async () => {

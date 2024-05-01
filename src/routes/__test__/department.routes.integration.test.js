@@ -7,18 +7,15 @@ describe("Department Routes", () => {
   const route = "/api/departments/";
 
   beforeEach(async () => {
-    const result = await request(app).post("/api/test/seedDB");
-    console.log(result.body.message);
+    await request(app).post("/api/test/seedDB");
   });
 
   afterEach(async () => {
-    const result = await request(app).delete("/api/test/dropDB");
-    console.log(result.body.message);
+    await request(app).delete("/api/test/dropDB");
   });
 
   afterAll(async () => {
-    const result = await request(app).delete("/api/test/dropDB");
-    console.log("DropDB after all tests finish", result.body.message);
+    await request(app).delete("/api/test/dropDB");
   });
 
   describe("POST /api/department/", () => {

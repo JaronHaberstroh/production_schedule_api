@@ -1,4 +1,5 @@
 import { connectDB, disconnectDB } from "#mongoDB/mongooseSetup.js";
+import mongoose from "mongoose";
 
 export default {
   name: "integration-env",

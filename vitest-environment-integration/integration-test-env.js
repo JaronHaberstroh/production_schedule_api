@@ -5,55 +5,20 @@ export default {
   transformMode: "ssr",
   async setup() {
     // Init DB variables
-    let mongoConnection, mongoServer;
+    let mongoConnection, mongoReplSet;
 
     // Connect to DB
-    ({ mongoConnection, mongoServer } = await connectDB());
+    ({ mongoConnection, mongoReplSet } = await connectDB());
 
+    // Add connection to globalThis object
     globalThis.mongoConnection = mongoConnection;
-    globalThis.mongoServer = mongoServer;
-    globalThis.seedDB = seedDB;
+    globalThis.mongoReplSet = mongoReplSet;
+
     return {
       async teardown() {
         // Disconnect from DB
-        disconnectDB(mongoConnection, mongoServer);
+        disconnectDB(mongoConnection, mongoReplSet);
       },
     };
   },
-};
-
-const seedDB = async (models) => {
-  const { Department, ProductionLine } = models;
-
-  let departments;
-  if (Department) {
-    departments = Array.from(
-      { length: 5 },
-      (_, idx) =>
-        new Department({
-          departmentName: `Department_${idx + 1}`,
-          productionLines: [],
-        })
-    );
-  }
-
-  if (ProductionLine) {
-    for (let i = 0; i < departments.length; i++) {
-      const productionLines = Array.from(
-        { length: 5 },
-        (_, idx) =>
-          new ProductionLine({
-            lineName: `ProductionLine_${idx + 1}`,
-            department: departments[i]._id,
-          })
-      );
-      const savedProductionLines = await ProductionLine.insertMany(
-        productionLines
-      );
-      departments[i].productionLines.push(
-        ...savedProductionLines.map((line) => line._id)
-      );
-    }
-  }
-  await Department.insertMany(departments);
 };

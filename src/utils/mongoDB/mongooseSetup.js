@@ -32,16 +32,16 @@ const connectDB = async () => {
   }
 };
 
-const disconnectDB = async (mongoConnection, mongoServer = null) => {
+const disconnectDB = async (mongoConnection, mongoReplSet = null) => {
   try {
     if (mongoConnection) {
       // Close mongoose connection if present
       await mongoConnection.disconnect();
     }
 
-    if (mongoServer) {
+    if (mongoReplSet) {
       // Close mongod server if present
-      await mongoServer.stop();
+      await mongoReplSet.stop();
     }
   } catch (error) {
     // Handle errors

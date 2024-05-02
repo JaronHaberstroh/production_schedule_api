@@ -18,7 +18,7 @@ const seedDB = async (req, res, next) => {
 
   const departments = createDepartmentsList(5);
 
-  const productionLinesList = createProductionLinesList(departments, 3);
+  const productionLinesList = createProductionLinesList(3, departments);
 
   departments.forEach((department, i) => {
     department.productionLines = department.productionLines.slice(

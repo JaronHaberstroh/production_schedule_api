@@ -56,6 +56,14 @@ const seedDB = async (req, res, next) => {
 };
 
 const dropDB = async (req, res, next) => {
+  if (process.env.NODE_ENV != "test") {
+    const error = new AppError(
+      `Path ${req.originalUrl} does not exist for ${req.method} method`,
+      404
+    );
+    return next(error);
+  }
+
   try {
     await mongoose.connection.db.dropDatabase();
     res.status(200).json(successResponse("DB drop completed", 200));

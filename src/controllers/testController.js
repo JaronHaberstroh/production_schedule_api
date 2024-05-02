@@ -45,9 +45,11 @@ const seedDB = async (req, res, next) => {
   }
 
   try {
-    await Department.insertMany(departments);
-    await ProductionLine.insertMany(productionLines);
-    await WorkPosition.insertMany(workPositions);
+    await Promise.all([
+      Department.insertMany(departments),
+      WorkPosition.insertMany(workPositions),
+      ProductionLine.insertMany(productionLines),
+    ]);
     res.status(200).json(successResponse("DB seeding completed", 201));
   } catch (error) {
     const err = new AppError(`Error while seeding DB; ${error.message}`, 500);

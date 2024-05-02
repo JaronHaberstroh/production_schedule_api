@@ -2,9 +2,8 @@ import { Router } from "express";
 import createProductionLine from "#controllers/productionLines/createProductionLine.js";
 import mongooseSession from "#middleware/mongooseSession.js";
 
-const router = Router();
+const router = Router({ mergeParams: true });
 
-const controller = mongooseSession(createProductionLine);
-router.post("/:departmentId/production-lines/", controller);
+router.post("/", mongooseSession(createProductionLine));
 
 export default router;

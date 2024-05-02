@@ -7,7 +7,7 @@ import testRoutes from "./test.routes.js";
 const router = Router();
 
 router.use("/departments", departmentRoutes);
-router.use("/departments", productionLineRoutes);
+router.use("/departments/:departmentId/production-lines", productionLineRoutes);
 router.use("/work-positions", workPositionRoutes);
 
 if (process.env.NODE_ENV === "test") {

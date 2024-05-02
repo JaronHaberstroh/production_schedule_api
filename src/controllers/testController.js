@@ -14,28 +14,11 @@ const seedDB = async (req, res, next) => {
     return next(error);
   }
 
-  let departments = [];
-  let productionLines = [];
-  let workPositions = [];
+  const workPositions = createWorkPositionsList(5);
 
-  for (let i = 1; i <= 5; i++) {
-    const department = new Department({
-      departmentName: `Department ${i}`,
-      productionLines: [],
-    });
-    departments.push(department);
-  }
+  const departments = createDepartmentsList(5);
 
-  for (let i = 0; i <= departments.length - 1; i++) {
-    for (let j = 1; j <= 3; j++) {
-      const productionLine = new ProductionLine({
-        lineName: `Production Line ${j}`,
-        department: departments[i]._id,
-      });
-      departments[i].productionLines.push(productionLine);
-      productionLines.push(productionLine);
-    }
-  }
+  const productionLinesList = createProductionLinesList(departments, 3);
 
   for (let i = 0; i <= 5; i++) {
     const workPosition = new WorkPosition({
@@ -73,6 +56,42 @@ const dropDB = async (req, res, next) => {
     const err = new AppError(`Error while dropping DB; ${error.message}`, 500);
     return next(err);
   }
+};
+
+const createDepartmentsList = (num) => {
+  return Array.from(
+    { length: num },
+    (_, i) =>
+      new Department({
+        departmentName: `Department ${i + 1}`,
+        productionLines: [],
+      })
+  );
+};
+
+const createWorkPositionsList = (num) => {
+  return Array.from(
+    { length: num },
+    (_, i) =>
+      new WorkPosition({
+        positionName: `Position Name ${i + 1}`,
+      })
+  );
+};
+
+const createProductionLinesList = (num, departmentList) => {
+  return departmentList
+    .map((department, i) =>
+      Array.from(
+        { length: num },
+        (_, j) =>
+          new ProductionLine({
+            lineName: `Production Line${i} ${j}`,
+            department: department._id,
+          })
+      )
+    )
+    .flat();
 };
 
 export { seedDB, dropDB };

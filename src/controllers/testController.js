@@ -20,10 +20,12 @@ const seedDB = async (req, res, next) => {
 
   const productionLinesList = createProductionLinesList(departments, 3);
 
-  for (let i = 0; i <= 5; i++) {
-    const workPosition = new WorkPosition({
-      positionName: `Position Name ${i}`,
-    });
+  departments.forEach((department, i) => {
+    department.productionLines = department.productionLines.slice(
+      i * 3, // Find start position
+      (i + 1) * 3 // Find end position
+    );
+  });
     workPositions.push(workPosition);
   }
 

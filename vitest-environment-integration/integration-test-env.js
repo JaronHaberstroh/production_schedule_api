@@ -21,7 +21,7 @@ export default {
         await mongoose.connection.db.dropDatabase();
 
         // Disconnect from DB
-        disconnectDB(mongoConnection, mongoReplSet);
+        await disconnectDB(mongoConnection, mongoReplSet);
       },
     };
   },

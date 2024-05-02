@@ -26,8 +26,6 @@ const seedDB = async (req, res, next) => {
       (i + 1) * 3 // Find end position
     );
   });
-    workPositions.push(workPosition);
-  }
 
   try {
     await Promise.all([

@@ -1,5 +1,5 @@
 import { Router } from "express";
-import createProductionLine from "#controllers/productionLines/createProductionLine.js";
+import createProductionLine from "#controllers/productionLine/createProductionLine.js";
 import mongooseSession from "#middleware/mongooseSession.js";
 
 const router = Router({ mergeParams: true });

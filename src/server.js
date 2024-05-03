@@ -9,6 +9,5 @@ app.listen(PORT, async () => {
   // Connect mongoDB
   await connectDB();
 
-app.listen(PORT, () => {
   console.log(`Listening on port: ${PORT}`);
 });

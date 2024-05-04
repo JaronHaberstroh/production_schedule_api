@@ -5,9 +5,13 @@ import AppError from "#utils/appError.js";
 
 const readProductionLine = async (req, res, next) => {
   try {
+    const departmentId = req.params.departmentId;
     const productionLineId = req.params._id;
 
-    const params = productionLineId ? { _id: productionLineId } : {};
+    const params = {
+      ...(departmentId && { department: departmentId }),
+      ...(productionLineId && { _id: productionLineId }),
+    };
 
     const result = await readDocument(ProductionLine, params);
 

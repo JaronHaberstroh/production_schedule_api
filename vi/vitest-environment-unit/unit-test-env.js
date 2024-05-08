@@ -1,16 +1,9 @@
-import { connectDB, disconnectDB } from "#mongoDB/mongooseSetup.js";
 import mongoose from "mongoose";
 
 export default {
   name: "unit-env",
   transformMode: "ssr",
   async setup() {
-    // Init DB variables
-    let mongoConnection, mongoReplSet;
-
-    // Connect to DB
-    ({ mongoConnection, mongoReplSet } = await connectDB());
-
     // Create mocks for Express objects and functions
     const mockReq = { body: {}, params: {}, session: {} };
     const mockRes = {
@@ -20,21 +13,14 @@ export default {
     };
     const mockNext = vi.fn();
 
-    generateTestData();
-
     // Add Express mocks to globalThis object
     globalThis.mockReq = mockReq;
     globalThis.mockRes = mockRes;
     globalThis.mockNext = mockNext;
+    globalThis.testData = generateTestData;
 
     return {
-      async teardown() {
-        // Drop DB
-        await mongoose.connection.db.dropDatabase();
-
-        // Disconnect from DB
-        await disconnectDB(mongoConnection, mongoReplSet);
-      },
+      async teardown() {},
     };
   },
 };

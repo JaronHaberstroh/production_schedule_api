@@ -1,9 +1,14 @@
 import Department from "#models/department.js";
+import { connectDB, disconnectDB } from "#utils/mongoDB/mongooseSetup.js";
 import mongoose from "mongoose";
 
 describe("Department Model", () => {
+  let mongoConnection, mongoReplSet
+  
   let testData;
-  beforeAll(() => {
+  beforeAll(async () => {
+    ({ mongoConnection, mongoReplSet }) = await connectDB()
+
     testData = {
       departmentName: "testDepartment",
     };
@@ -11,6 +16,8 @@ describe("Department Model", () => {
 
   afterAll(async () => {
     await Department.deleteMany();
+
+    await disconnectDB(mongoConnection, mongoReplSet)
   });
 
   test("should create and save department successfully", async () => {

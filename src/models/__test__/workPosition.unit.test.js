@@ -1,9 +1,14 @@
 import WorkPosition from "#models/workPosition.js";
+import { connectDB, disconnectDB } from "#utils/mongoDB/mongooseSetup.js";
 import mongoose from "mongoose";
 
 describe("Work position model", () => {
+  let mongoConnection, mongoReplSet
+
   let testData;
-  beforeAll(() => {
+  beforeAll(async () => {
+    ({ mongoConnection, mongoReplSet }) = await connectDB()
+    
     testData = {
       positionName: "Test Position",
     };
@@ -11,6 +16,8 @@ describe("Work position model", () => {
 
   afterAll(async () => {
     await WorkPosition.deleteMany();
+
+    await disconnectDB(mongoConnection, mongoReplSet)
   });
 
   test("should create and save work position successfully", async () => {

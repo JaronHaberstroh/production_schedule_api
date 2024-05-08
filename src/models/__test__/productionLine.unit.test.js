@@ -1,11 +1,16 @@
 import Department from "#models/department.js";
 import ProductionLine from "#models/productionLine.js";
+import { connectDB, disconnectDB } from "#utils/mongoDB/mongooseSetup.js";
 import mongoose from "mongoose";
 
 describe("ProductionLine model", () => {
+  let mongoConnection, mongoReplSet
+
   let testData = [];
   let testDepartments = [];
   beforeAll(async () => {
+    ({ mongoConnection, mongoReplSet }) = await connectDB()
+    
     for (let i = 1; i <= 5; i++) {
       const department = new Department({
         departmentName: `Department ${i}`,
@@ -30,6 +35,8 @@ describe("ProductionLine model", () => {
   afterAll(async () => {
     await Department.deleteMany();
     await ProductionLine.deleteMany();
+
+    await disconnectDB(mongoConnection, mongoReplSet)
   });
 
   test("should create and save production lines successfully", async () => {

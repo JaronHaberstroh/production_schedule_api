@@ -2,10 +2,15 @@ import createProductionLine from "../createProductionLine.js";
 import Department from "#models/department.js";
 import AppError from "#utils/appError.js";
 import mongoose from "mongoose";
+import { connectDB, disconnectDB } from "#utils/mongoDB/mongooseSetup.js";
 
 describe("Create productionLine controller", () => {
+  let mongoConnection, mongoReplSet;
+
   let department;
   beforeAll(async () => {
+    ({ mongoConnection, mongoReplSet } = await connectDB());
+
     department = new Department({
       departmentName: "Test Department",
     });
@@ -18,6 +23,10 @@ describe("Create productionLine controller", () => {
       body: { lineName: "Test Line" },
       session: await mongoose.startSession(),
     };
+  });
+
+  afterAll(async () => {
+    await disconnectDB(mongoConnection, mongoReplSet);
   });
 
   test("should return success response when successful", async () => {

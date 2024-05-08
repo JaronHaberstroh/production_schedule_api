@@ -15,8 +15,8 @@ export default defineConfig({
       },
     },
     environmentMatchGlobs: [
-      ["src/**/*unit.test.js", "unit"],
-      ["src/**/*integration.test.js", "integration"],
+      ["src/**/*unit.test.js", "vi/vitest-environment-unit"],
+      ["src/**/*integration.test.js", "vi/vitest-environment-integration"],
     ],
   },
 });

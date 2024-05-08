@@ -1,3 +1,4 @@
+import { connectDB, disconnectDB } from "#mongoDB/mongooseSetup.js";
 import mongoose from "mongoose";
 
 export default {
@@ -13,11 +14,12 @@ export default {
     };
     const mockNext = vi.fn();
 
+    generateTestData();
+
     // Add Express mocks to globalThis object
     globalThis.mockReq = mockReq;
     globalThis.mockRes = mockRes;
     globalThis.mockNext = mockNext;
-    globalThis.testData = generateTestData;
 
     return {
       async teardown() {},

@@ -1,14 +1,23 @@
+import { connectDB, disconnectDB } from "#utils/mongoDB/mongooseSetup.js";
 import readDocument from "../readDocument.js";
 
 describe("readDocument()", () => {
+  let mongoConnection, mongoReplSet;
+
   let testDocuments;
   beforeAll(async () => {
+    ({ mongoConnection, mongoReplSet } = await connectDB());
+
     testDocuments = [
       { name: "Jane", age: 23, gender: "female" },
       { name: "Joe", age: 35, gender: "male" },
       { name: "John", age: 55, gender: "male" },
     ];
     await testModel.insertMany(testDocuments);
+  });
+
+  afterAll(async () => {
+    await disconnectDB(mongoConnection, mongoReplSet);
   });
 
   test("should return success object when successful", async () => {

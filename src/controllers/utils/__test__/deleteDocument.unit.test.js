@@ -1,11 +1,22 @@
+import { connectDB, disconnectDB } from "#utils/mongoDB/mongooseSetup.js";
 import deleteDocument from "../deleteDocument.js";
 
 describe("deleteDocument()", () => {
+  let mongoConnection, mongoReplSet;
+
   let testDocument;
+  beforeAll(async () => {
+    ({ mongoConnection, mongoReplSet } = await connectDB());
+  });
+
   beforeEach(async () => {
     // Create testDocument in DB
     const document = new testModel(testData);
     testDocument = await document.save();
+  });
+
+  afterAll(async () => {
+    await disconnectDB(mongoConnection, mongoReplSet);
   });
 
   test("should return success object on successful completion", async () => {

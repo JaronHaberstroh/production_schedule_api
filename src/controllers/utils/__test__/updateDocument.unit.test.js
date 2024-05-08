@@ -1,7 +1,14 @@
+import { connectDB, disconnectDB } from "#utils/mongoDB/mongooseSetup.js";
 import updateDocumment from "../updateDocument.js";
 
 describe("updateDocument()", () => {
+  let mongoConnection, mongoReplSet;
+
   let testDocument, updateDocumentData;
+  beforeAll(async () => {
+    ({ mongoConnection, mongoReplSet } = await connectDB());
+  });
+
   beforeEach(async () => {
     // Create testDocument in DB
     const document = new testModel(testData);
@@ -12,6 +19,10 @@ describe("updateDocument()", () => {
       query: testDocument._id,
       params: { name: "Jane", age: 34, gender: "female" },
     };
+  });
+
+  afterAll(async () => {
+    await disconnectDB(mongoConnection, mongoReplSet);
   });
 
   test("should return success object when successful", async () => {

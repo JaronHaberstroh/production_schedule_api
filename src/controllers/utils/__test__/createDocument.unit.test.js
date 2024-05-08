@@ -1,6 +1,16 @@
+import { connectDB, disconnectDB } from "#utils/mongoDB/mongooseSetup.js";
 import createDocument from "../createDocument.js";
 
 describe("createDocumnet()", () => {
+  let mongoConnection, mongoReplSet;
+  beforeAll(async () => {
+    ({ mongoConnection, mongoReplSet } = await connectDB());
+  });
+
+  afterAll(async () => {
+    await disconnectDB(mongoConnection, mongoReplSet);
+  });
+
   test("should return success object on successful completion", async () => {
     // Create document
     const document = await createDocument(testModel, testData);

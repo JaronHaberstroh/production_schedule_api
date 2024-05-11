@@ -34,7 +34,7 @@ describe("Production line routes", () => {
 
       expect(response.statusCode).toBe(201);
       expect(resBody.data._id).toBeTruthy();
-      expect(updatedDepartment.productionLines[0].toString()).toEqual(
+      expect(updatedDepartment.productionLines[3].toString()).toEqual(
         resBody.data._id
       );
     });

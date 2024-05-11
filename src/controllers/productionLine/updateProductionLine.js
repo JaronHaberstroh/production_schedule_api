@@ -90,6 +90,8 @@ const updateDepartmentProductionLineArray = async (
     if (!updatedDepartment) {
       return errorResponse(`Failed to update Document`, 500);
     }
+
+    return updatedDepartment;
   } catch (error) {
     return errorResponse(
       `Unhandled Error: ${error.message}`,

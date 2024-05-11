@@ -21,7 +21,7 @@ const seedDB = async (req, res, next) => {
   const productionLinesList = createProductionLinesList(3, departments);
 
   departments.forEach((department, i) => {
-    department.productionLines = department.productionLines.slice(
+    department.productionLines = productionLinesList.slice(
       i * 3, // Find start position
       (i + 1) * 3 // Find end position
     );

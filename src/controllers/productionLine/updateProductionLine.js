@@ -44,13 +44,14 @@ const updateProductionLine = async (req, res, next) => {
         return next(newDepartment.error);
       }
     }
+
     res
       .status(200)
       .json(
         successResponse(
-          `Production line update successfully`,
-          200,
-          productionLine
+          productionLine.message,
+          productionLine.statusCode,
+          productionLine.data
         )
       );
   } catch (error) {

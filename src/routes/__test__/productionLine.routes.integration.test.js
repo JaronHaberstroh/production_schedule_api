@@ -86,8 +86,6 @@ describe("Production line routes", () => {
       const response = await request(app).get(`${route}${query}`);
       const resBody = response.body;
 
-      console.log(resBody);
-
       expect(response.statusCode).toBe(400);
       expect(resBody.message).toContain("Validation Error");
     });

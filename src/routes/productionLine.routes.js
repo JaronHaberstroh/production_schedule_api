@@ -19,10 +19,10 @@ router.get("/", readProductionLine);
 
 router.patch(
   "/:_id",
-  [checkId(ProductionLine), checkName("lineName", ProductionLine)],
+  [checkId(ProductionLine), checkName("lineName", ProductionLine), validate],
   mongooseSession(updateProductionLine)
 );
 
-router.delete("/", [checkId(ProductionLine)]);
+router.delete("/", [checkId(ProductionLine), validate]);
 
 export default router;

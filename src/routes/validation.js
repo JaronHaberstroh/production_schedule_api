@@ -21,10 +21,10 @@ const checkName = (field, Model) => {
       .trim()
       .notEmpty()
       .withMessage(`${field} field is required`)
+      .isAlphanumeric("en-US", { ignore: " " })
+      .withMessage(`${field} must contain only numbers, letters, and spaces`)
       .isLength({ min: 3 })
       .withMessage(`${field} must be at least 3 characterse long`)
-      .isAlphanumeric("en-US", { ignore: " " })
-      .withMessage(`${field} must be alphanumeric`)
       .custom(async (value) => {
         const result = await Model.findOne({ [field]: value });
         if (result) {

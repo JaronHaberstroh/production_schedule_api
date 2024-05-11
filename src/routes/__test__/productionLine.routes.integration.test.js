@@ -92,9 +92,55 @@ describe("Production line routes", () => {
   });
 
   describe(`PATCH ${route}:_id`, async () => {
-    test("should successfully update production line", async () => {});
-    test("should fail to update production line if params not provided", async () => {});
-    test("should fail to update production line if invalid id provided");
+    test("should successfully update production line", async () => {
+      const productionLine = await ProductionLine.findOne({
+        department: department.id,
+      });
+
+      const departmentList = await Department.find();
+
+      const params = {
+        department: departmentList[1].id,
+        lineName: "New Line Name",
+      };
+
+      const response = await request(app)
+        .patch(`${route}${productionLine.id}`)
+        .send(params);
+      const resBody = response.body;
+
+      const updatedDepartment = await Department.findById(params.department);
+
+      expect(response.statusCode).toBe(200);
+      expect(resBody.data.lineName).toBe(params.lineName);
+      expect(resBody.data.department).toBe(params.department);
+      expect(updatedDepartment.productionLines.length).toBe(4);
+      expect(updatedDepartment.productionLines[3].toString()).toBe(
+        productionLine.id
+      );
+    });
+    test("should fail to update production line if params not provided", async () => {
+      const productionLine = await ProductionLine.findOne({
+        department: department.id,
+      });
+
+      const response = await request(app)
+        .patch(`${route}${productionLine.id}`)
+        .send();
+      const resBody = response.body;
+
+      expect(response.statusCode).toBe(400);
+      expect(resBody.message).toContain("Validation Error");
+    });
+    test("should fail to update production line if invalid id provided", async () => {
+      const invalidId = new mongoose.Types.ObjectId();
+
+      const response = await request(app).patch(`${route}${invalidId}`);
+      const resBody = response.body;
+
+      expect(response.statusCode).toBe(400);
+      expect(resBody.message).toContain("Validation Error");
+    });
   });
 
   describe(`DELETE ${route}:_id`, async () => {

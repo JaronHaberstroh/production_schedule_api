@@ -28,7 +28,11 @@
     "mongoose": "^8.2.4"
   },
   "devDependencies": {
+    "@eslint/js": "^9.2.0",
     "@vitest/coverage-v8": "^1.4.0",
+    "eslint": "^9.2.0",
+    "eslint-plugin-vitest": "^0.5.4",
+    "globals": "^15.2.0",
     "mongodb-memory-server": "^9.1.8",
     "nodemon": "^3.1.0",
     "supertest": "^6.3.4",

@@ -1,5 +1,4 @@
 import Department from "#models/department";
-import AppError from "#utils/appError";
 import mongoose from "mongoose";
 import editDocumentList from "../editDocumentList";
 

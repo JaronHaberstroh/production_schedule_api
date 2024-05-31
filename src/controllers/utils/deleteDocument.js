@@ -1,21 +1,23 @@
 import { successResponse, errorResponse } from "#responses/response.js";
 
-const deleteDocument = async (model, params) => {
-  let result;
+const deleteDocument = async (model, params, session = undefined) => {
   try {
-    result = await model.deleteOne(params);
+    const result = await model.deleteOne(params, { session });
+    return handleResult(result);
   } catch (error) {
     return errorResponse(
-      `Error deleting document: ${error.message}`,
-      error.statusCode || 500
+      error.message || "Error occured while deleting document",
+      error.statusCode || 500,
     );
   }
+};
 
+const handleResult = (result) => {
   if (!result.deletedCount) {
-    return errorResponse(`Document not deleted`, 500);
+    return errorResponse("Failed to delete document", 500);
   }
 
-  return successResponse(`Successfully deleted document`, 200, result);
+  return successResponse("Document successfully deleted", 200, result);
 };
 
 export default deleteDocument;

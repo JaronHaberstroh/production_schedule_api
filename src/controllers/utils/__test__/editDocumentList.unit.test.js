@@ -1,37 +1,107 @@
-import Department from "#models/department";
-import mongoose from "mongoose";
+import AppError from "#utils/appError";
 import editDocumentList from "../editDocumentList";
+import { successResponse, errorResponse } from "#responses/response";
+
+vi.mock("#responses/response", () => ({
+  default: undefined,
+  errorResponse: vi.fn(),
+  successResponse: vi.fn(),
+}));
 
 describe("editDocumentList()", () => {
-  const testId0 = new mongoose.Types.ObjectId();
-  const testId1 = new mongoose.Types.ObjectId();
-  const testId2 = new mongoose.Types.ObjectId();
-  const testDocument = Department({
-    departmentName: "Test Department",
-    productionLines: [testId0, testId1, testId2],
+  const document = {
+    testList: {
+      pull: vi.fn(),
+      push: vi.fn(),
+    },
+  };
+
+  const mockSuccessResponse = {
+    success: true,
+    statusCode: 200,
+    message: "Successful message",
+    data: document,
+    error: null,
+  };
+
+  const mockErrorResponse = {
+    success: false,
+    statusCode: 500,
+    message: "Unsuccessful message",
+    data: null,
+    error: new AppError("Unsuccessful message", 500),
+  };
+
+  test("should successfully pull a document from the list", () => {
+    successResponse.mockReturnValueOnce(mockSuccessResponse);
+
+    const kwargs = {
+      documentList: "testList",
+      action: "pull",
+      subDocId: "testId0",
+    };
+    const response = editDocumentList(document, kwargs);
+
+    expect(document.testList.pull).toBeCalledWith("testId0");
+    expect(successResponse).toBeCalledWith(
+      "Successfully edited testList",
+      200,
+      document,
+    );
+    expect(response).toEqual(mockSuccessResponse);
   });
 
-  test("should return edited document when successful", () => {
-    const result = editDocumentList(testDocument, {
-      documentList: "productionLines",
-      action: "pull",
-      subDocId: testId0,
-    });
+  test("should successfully push a document to the list", () => {
+    successResponse.mockReturnValueOnce(mockSuccessResponse);
 
-    expect(result.productionLines).not.toContain(testId0);
+    const kwargs = {
+      documentList: "testList",
+      action: "push",
+      subDocId: "testId1",
+    };
+    const response = editDocumentList(document, kwargs);
+
+    expect(document.testList.push).toBeCalledWith("testId1");
+    expect(successResponse).toBeCalledWith(
+      "Successfully edited testList",
+      200,
+      document,
+    );
+    expect(response).toEqual(mockSuccessResponse);
+  });
+
+  test("should return error response when documentList does not exist", () => {
+    errorResponse.mockReturnValueOnce(mockErrorResponse);
+
+    const kwargs = {
+      documentList: "invalidList",
+      action: "push",
+      subDocId: "testId2",
+    };
+    const response = editDocumentList(document, kwargs);
+
+    expect(document.testList.pull).not.toBeCalled();
+    expect(document.testList.push).not.toBeCalled();
+    expect(errorResponse).toBeCalledWith(
+      "Document list invalidList does not exist",
+      400,
+    );
+    expect(response).toEqual(mockErrorResponse);
   });
 
   test("should return error when invalid action provided", () => {
-    const result = editDocumentList(testDocument, {
-      documentList: "productionLines",
-      action: "turn",
-      subDocId: testId1,
-    });
+    errorResponse.mockReturnValueOnce(mockErrorResponse);
 
-    expect(result.success).toBeFalsy();
-    expect(result.message).toBeTruthy();
-    expect(result.statusCode).toBeTruthy();
-    expect(result.data).toBe(null);
-    expect(result.error).toBeTypeOf("object");
+    const kwargs = {
+      documentList: "testList",
+      action: "turn",
+      subDocId: "testId3",
+    };
+    const response = editDocumentList(document, kwargs);
+
+    expect(document.testList.push).not.toBeCalled();
+    expect(document.testList.pull).not.toBeCalled();
+    expect(errorResponse).toBeCalledWith("Action not provided", 400);
+    expect(response).toEqual(mockErrorResponse);
   });
 });

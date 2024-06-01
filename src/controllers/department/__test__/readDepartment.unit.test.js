@@ -1,12 +1,16 @@
 import readDepartment from "../readDepartment.js";
-import readDocument from "#controllers/utils/readDocument.js";
+import findDocuments from "#controllers/utils/findDocuments.js";
+import Department from "#models/department.js";
 import AppError from "#utils/appError.js";
+import { successResponse } from "#responses/response.js";
 
-// Mock readDocument function
-vi.mock("#controllers/utils/readDocument.js", () => ({ default: vi.fn() }));
+vi.mock("#controllers/utils/findDocuments.js", () => ({ default: vi.fn() }));
+vi.mock("#responses/response.js", () => ({
+  default: vi.fn(),
+  successResponse: vi.fn(),
+}));
 
 describe("Read department controller", () => {
-  // Setup test variables
   const mockReadDocumentSuccess = {
     success: true,
     message: "test message",
@@ -21,40 +25,43 @@ describe("Read department controller", () => {
     error: new AppError(),
   };
 
-  test("should return success response when successful", async () => {
-    // Mock return value for successful operation
-    readDocument.mockResolvedValueOnce(mockReadDocumentSuccess);
+  test("should find documents", async () => {
+    findDocuments.mockResolvedValueOnce(mockReadDocumentSuccess);
 
-    // Call read department controller
     await readDepartment(mockReq, mockRes, mockNext);
 
-    // Expect response to have been called
-    expect(mockRes.status).toBeCalled();
-    expect(mockRes.json).toBeCalled();
+    expect(findDocuments).toBeCalledWith(Department, {});
   });
 
-  test("should pass error to next when unsuccessful", async () => {
-    // Mock return value for failed operation
-    readDocument.mockRejectedValueOnce(mockReadDocumentError);
+  test("should return success response when successful", async () => {
+    findDocuments.mockResolvedValueOnce(mockReadDocumentSuccess);
 
-    // Call read department controller
     await readDepartment(mockReq, mockRes, mockNext);
 
-    // Expect Error to be passed to next
-    expect(mockNext).toBeCalledWith(expect.any(AppError));
+    expect(successResponse).toBeCalled();
+    expect(mockRes.status).toBeCalled();
+    expect(mockRes.json).toBeCalled();
+    expect(mockNext).not.toBeCalled();
   });
 
   test("should pass error to next if no data found", async () => {
-    // Mock return value for successful operation with no returned results
-    readDocument.mockRejectedValueOnce({
+    findDocuments.mockResolvedValueOnce({
       ...mockReadDocumentSuccess,
       data: [],
     });
 
-    // Call read department controller
     await readDepartment(mockReq, mockRes, mockNext);
 
-    // Expect Error to be passed to next
     expect(mockNext).toBeCalledWith(expect.any(AppError));
+  });
+
+  test("should pass error to next when unsuccessful", async () => {
+    findDocuments.mockRejectedValueOnce(mockReadDocumentError);
+
+    await readDepartment(mockReq, mockRes, mockNext);
+
+    expect(mockNext).toBeCalledWith(expect.any(AppError));
+    expect(mockRes.status).not.toBeCalled();
+    expect(mockRes.json).not.toBeCalled();
   });
 });

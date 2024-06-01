@@ -1,46 +1,65 @@
 import createDepartment from "../createDepartment.js";
 import createDocument from "#controllers/utils/createDocument.js";
+import saveDocument from "#controllers/utils/saveDocument.js";
+import Department from "#models/department.js";
 import AppError from "#utils/appError.js";
+import { successResponse } from "#responses/response.js";
 
-// Mock createDocument function
 vi.mock("#controllers/utils/createDocument.js", () => ({ default: vi.fn() }));
+vi.mock("#controllers/utils/saveDocument.js", () => ({ default: vi.fn() }));
+vi.mock("#responses/response.js", () => ({
+  default: vi.fn(),
+  successResponse: vi.fn(),
+}));
 
 describe("Create department controller", () => {
-  // Setup test variables
-  const mockCreateDocumentSuccess = {
+  const testData = { departmentName: "testDepartment" };
+
+  const mockSuccessResponse = {
     success: true,
     message: "test message",
-    data: { departmentName: "testDepartment" },
+    data: testData,
     error: null,
   };
 
-  const mockCreateDocumentError = {
+  const mockErrorResponse = {
     success: false,
     message: "failed message",
     data: null,
     error: new AppError(),
   };
 
-  test("should return success response when successful", async () => {
-    // Mock return value for successful operation
-    createDocument.mockResolvedValueOnce(mockCreateDocumentSuccess);
+  mockReq.body = testData;
 
-    // Call create department controller
+  test("should create and save document", async () => {
+    createDocument.mockReturnValueOnce(testData);
+
+    saveDocument.mockResolvedValueOnce(mockSuccessResponse);
+
     await createDepartment(mockReq, mockRes, mockNext);
 
-    // Expect response to have been called
+    expect(createDocument).toBeCalledWith(Department, testData);
+    expect(saveDocument).toBeCalledWith(testData);
+  });
+
+  test("should return success response when successful", async () => {
+    saveDocument.mockResolvedValueOnce(mockSuccessResponse);
+
+    await createDepartment(mockReq, mockRes, mockNext);
+
+    expect(successResponse).toBeCalled();
     expect(mockRes.status).toBeCalled();
     expect(mockRes.json).toBeCalled();
+    expect(mockNext).not.toBeCalled();
   });
 
   test("should pass error to next if unsuccessful", async () => {
-    // Mock return value for failed operation
-    createDocument.mockRejectedValueOnce(mockCreateDocumentError);
+    saveDocument.mockRejectedValueOnce(mockErrorResponse);
 
-    // Call create department controller
     await createDepartment(mockReq, mockRes, mockNext);
 
-    // Expect Error to be passed to next
     expect(mockNext).toBeCalledWith(expect.any(AppError));
+    expect(mockRes.status).not.toBeCalled();
+    expect(mockRes.json).not.toBeCalled();
   });
 });

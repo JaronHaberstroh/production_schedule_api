@@ -1,51 +1,71 @@
 import readProductionLine from "../readProductionLine.js";
-import readDocument from "#controllers/utils/readDocument.js";
+import findDocuments from "#controllers/utils/findDocuments.js";
+import ProductionLine from "#models/productionLine.js";
 import AppError from "#utils/appError.js";
+import { successResponse } from "#responses/response.js";
 
-// Mock readDocument function
-vi.mock("#controllers/utils/readDocument.js", () => ({ default: vi.fn() }));
+vi.mock("#controllers/utils/findDocuments.js", () => ({ default: vi.fn() }));
+vi.mock("#responses/response.js", () => ({
+  default: vi.fn(),
+  successResponse: vi.fn(),
+}));
 
 describe("Read productionLine controller", () => {
-  // Setup test variables
-  const mockReadDocumentSuccess = {
+  mockReq = {
+    params: {
+      _id: "test productionLine id",
+      departmentId: "test departmentId",
+    },
+  };
+
+  const mockSuccessResponse = {
     success: true,
     message: "test message",
-    data: [{ lineName: "test" }],
+    data: "test data",
     error: null,
   };
 
-  const mockReadDocumentError = {
+  const mockErrorResponse = {
     success: false,
     message: "failed message",
     data: null,
-    error: new AppError(),
+    error: new AppError("error message", 500),
   };
 
-  test("should return success response when successful", async () => {
-    // Mock return value for successful operation
-    readDocument.mockResolvedValueOnce(mockReadDocumentSuccess);
+  test("should find prouction lines", async () => {
+    const params = {
+      department: mockReq.params.departmentId,
+      _id: mockReq.params._id,
+    };
+
+    findDocuments.mockResolvedValueOnce(mockSuccessResponse);
 
     await readProductionLine(mockReq, mockRes, mockNext);
 
-    expect(mockRes.status).toBeCalledWith(200);
-    expect(mockRes.json).toBeCalled();
+    expect(findDocuments).toBeCalledWith(ProductionLine, params);
   });
 
-  test("should pass error to next when unsuccessful", async () => {
-    // Mock return value for failed operation
-    readDocument.mockRejectedValueOnce(mockReadDocumentError);
+  test("should pass error to next when find lines unsuccessful", async () => {
+    findDocuments.mockResolvedValueOnce(mockErrorResponse);
 
     await readProductionLine(mockReq, mockRes, mockNext);
 
     expect(mockNext).toBeCalledWith(expect.any(AppError));
   });
 
-  test("should pass error to next when no data found", async () => {
-    // Mock return value for successful operation with no returned results
-    readDocument.mockRejectedValueOnce({
-      ...mockReadDocumentSuccess,
-      data: [],
-    });
+  test("should return success response when successful", async () => {
+    findDocuments.mockResolvedValueOnce(mockSuccessResponse);
+
+    await readProductionLine(mockReq, mockRes, mockNext);
+
+    expect(successResponse).toBeCalled();
+    expect(mockRes.status).toBeCalled();
+    expect(mockRes.json).toBeCalled();
+    expect(mockNext).not.toBeCalled();
+  });
+
+  test("should pass error to next when unsuccessful", async () => {
+    findDocuments.mockRejectedValue(mockErrorResponse);
 
     await readProductionLine(mockReq, mockRes, mockNext);
 

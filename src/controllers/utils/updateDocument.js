@@ -1,5 +1,5 @@
-const updateDocumment = (document, params) => {
+const updateDocument = (document, params) => {
   return Object.assign(document, params);
 };
 
-export default updateDocumment;
+export default updateDocument;

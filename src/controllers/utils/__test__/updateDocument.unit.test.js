@@ -1,4 +1,4 @@
-import updateDocumment from "../updateDocument.js";
+import updateDocument from "../updateDocument.js";
 
 describe("updateDocument()", () => {
   const document = { _id: "test id", name: "original name" };
@@ -6,7 +6,7 @@ describe("updateDocument()", () => {
   test("should return updated document with merged properties", () => {
     const params = { name: "updated name" };
 
-    const result = updateDocumment({ ...document }, params);
+    const result = updateDocument({ ...document }, params);
 
     const expectedResult = { _id: "test id", name: "updated name" };
 
@@ -16,7 +16,7 @@ describe("updateDocument()", () => {
   test("should add new fields", () => {
     const params = { age: 34, time: "now" };
 
-    const result = updateDocumment({ ...document }, params);
+    const result = updateDocument({ ...document }, params);
 
     const expectedResult = {
       _id: "test id",
@@ -31,7 +31,7 @@ describe("updateDocument()", () => {
   test("should return original document if params are empty", () => {
     const params = {};
 
-    const result = updateDocumment({ ...document }, params);
+    const result = updateDocument({ ...document }, params);
 
     expect(result).toEqual(document);
   });

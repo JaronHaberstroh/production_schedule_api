@@ -1,47 +1,61 @@
-import updateDocumment from "#controllers/utils/updateDocument.js";
+import findDocumentById from "#controllers/utils/findDocumentById";
+import saveDocument from "#controllers/utils/saveDocument";
+import updateDocument from "#controllers/utils/updateDocument.js";
 import Department from "#models/department.js";
 import ProductionLine from "#models/productionLine.js";
-import { errorResponse, successResponse } from "#responses/response.js";
 import AppError from "#utils/appError.js";
+import { successResponse } from "#responses/response.js";
 
 const updateProductionLine = async (req, res, next) => {
   const { departmentId, _id: productionLineId } = req.params;
   const { lineName, department: newDepartmentId } = req.body;
   const session = req.session;
 
-  try {
-    const params = {};
-    if (newDepartmentId) params.department = newDepartmentId;
-    if (lineName) params.lineName = lineName;
+  const params = {
+    ...(newDepartmentId && { department: newDepartmentId }),
+    ...(lineName && { lineName: lineName }),
+  };
 
-    const productionLine = await updateDocumment(
-      ProductionLine,
-      { query: productionLineId, params: params },
-      session
+  try {
+    const productionLine = await handleProductionLine(
+      productionLineId,
+      params,
+      session,
     );
+
     if (productionLine.error) {
-      return next(productionLine.error);
+      const err = productionLine.error;
+      throw new AppError(
+        `Failed to update productionLine: ${err.message}`,
+        err.statusCode || 500,
+      );
     }
 
     if (newDepartmentId && newDepartmentId !== departmentId) {
-      const oldDepartment = await updateDepartmentProductionLineArray(
+      const oldDepartment = await handleOldDepartment(
         departmentId,
-        productionLineId,
-        "pull",
-        session
+        productionLine,
+        session,
       );
       if (oldDepartment.error) {
-        return next(oldDepartment.error);
+        const err = oldDepartment.error;
+        throw new AppError(
+          `Failed to update original department document: ${err.message}`,
+          err.statusCode || 500,
+        );
       }
 
-      const newDepartment = await updateDepartmentProductionLineArray(
+      const newDepartment = await handleNewDepartment(
         newDepartmentId,
-        productionLineId,
-        "push",
-        session
+        productionLine,
+        session,
       );
       if (newDepartment.error) {
-        return next(newDepartment.error);
+        const err = newDepartment.error;
+        throw new AppError(
+          `Failed to update new department document: ${err.message}`,
+          err.statusCode || 500,
+        );
       }
     }
 
@@ -51,53 +65,94 @@ const updateProductionLine = async (req, res, next) => {
         successResponse(
           productionLine.message,
           productionLine.statusCode,
-          productionLine.data
-        )
+          productionLine.data,
+        ),
       );
   } catch (error) {
+    if (error instanceof AppError) {
+      return next(error);
+    }
     const err = new AppError(`Unhandled Exception: ${error.message}`, 500);
     return next(err);
   }
 };
 
-const updateDepartmentProductionLineArray = async (
-  departmentId,
-  productionLineId,
-  action,
-  session
-) => {
-  try {
-    const department = await Department.findById(departmentId);
-    if (!department) {
-      return errorResponse(
-        `Unable to find document ${error.message}`,
-        error.statusCode || 500
-      );
-    }
-
-    switch (action) {
-      case "pull":
-        department.productionLines.pull(productionLineId);
-        break;
-      case "push":
-        department.productionLines.push(productionLineId);
-        break;
-      default:
-        return errorResponse(`Action not provided`, 500);
-    }
-
-    const updatedDepartment = await department.save({ session });
-    if (!updatedDepartment) {
-      return errorResponse(`Failed to update Document`, 500);
-    }
-
-    return updatedDepartment;
-  } catch (error) {
-    return errorResponse(
-      `Unhandled Error: ${error.message}`,
-      error.statusCode || 500
-    );
+const handleProductionLine = async (id, params, session) => {
+  const productionLine = await findDocumentById(ProductionLine, id);
+  if (!productionLine.success) {
+    return {
+      error: new AppError(
+        `Failed to find production line document: ${productionLine.message}`,
+        productionLine.statusCode || 500,
+      ),
+    };
   }
+  const productionLineDocument = productionLine.data;
+  const updatedProductionLine = await updateDocument(
+    productionLineDocument,
+    params,
+  );
+  const savedProductionLine = await saveDocument(
+    updatedProductionLine,
+    session,
+  );
+  if (!savedProductionLine.success) {
+    return {
+      error: new AppError(
+        `Failed to save old department: ${savedProductionLine.message}`,
+        savedProductionLine.message || 500,
+      ),
+    };
+  }
+  return savedProductionLine.data;
+};
+
+const handleOldDepartment = async (id, productionLine, session) => {
+  const oldDepartment = await findDocumentById(Department, id);
+  if (!oldDepartment.success) {
+    return {
+      error: new AppError(
+        `Failed to find old department document: ${oldDepartment.message}`,
+        oldDepartment.statusCode || 500,
+      ),
+    };
+  }
+  const oldDepartmentDocument = oldDepartment.data;
+  oldDepartmentDocument.productionLines.pull(productionLine);
+  const oldDepartmentSaved = await saveDocument(oldDepartmentDocument, session);
+  if (!oldDepartmentSaved.success) {
+    return {
+      error: new AppError(
+        `Failed to save old department: ${oldDepartmentSaved.message}`,
+        oldDepartmentSaved.message || 500,
+      ),
+    };
+  }
+  return oldDepartmentSaved.data;
+};
+
+const handleNewDepartment = async (id, productionLine, session) => {
+  const newDepartment = await findDocumentById(Department, id);
+  if (!newDepartment.success) {
+    return {
+      error: new AppError(
+        `Failed to find new department document: ${newDepartment.message}`,
+        newDepartment.statusCode || 500,
+      ),
+    };
+  }
+  const newDepartmentDocument = newDepartment.data;
+  newDepartmentDocument.productionLines.push(productionLine);
+  const newDepartmentSaved = await saveDocument(newDepartmentDocument, session);
+  if (!newDepartmentSaved.success) {
+    return {
+      error: new AppError(
+        `Failed to save old department: ${newDepartmentSaved.message}`,
+        newDepartmentSaved.message || 500,
+      ),
+    };
+  }
+  return newDepartmentSaved.data;
 };
 
 export default updateProductionLine;

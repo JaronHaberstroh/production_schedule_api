@@ -1,5 +1,5 @@
 import findDocumentById from "#controllers/utils/findDocumentById";
-import updateDocumment from "#controllers/utils/updateDocument.js";
+import updateDocument from "#controllers/utils/updateDocument.js";
 import saveDocument from "#controllers/utils/saveDocument";
 import Department from "#models/department.js";
 import AppError from "#utils/appError.js";
@@ -20,7 +20,7 @@ const updateDepartment = async (req, res, next) => {
       );
     }
 
-    const updatedDocument = await updateDocumment(document.data, params);
+    const updatedDocument = await updateDocument(document.data, params);
 
     const result = await saveDocument(updatedDocument);
     handleResult(res, result);

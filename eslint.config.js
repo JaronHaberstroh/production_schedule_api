@@ -18,11 +18,9 @@ export default [
     languageOptions: {
       globals: {
         ...vitest.environments.env.globals,
-        mockReq: "writable",
-        mockRes: "writable",
-        mockNext: "writable",
-        testModel: "writable",
-        testData: "writable",
+        mockReq: true,
+        mockRes: true,
+        mockNext: true,
       },
     },
   },

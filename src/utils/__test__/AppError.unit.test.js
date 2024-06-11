@@ -1,4 +1,4 @@
-import AppError from "#utils/appError.js";
+import AppError from "#utils/AppError.js";
 
 describe("Custom AppError", () => {
   let message, statusCode;

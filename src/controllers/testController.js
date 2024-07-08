@@ -6,6 +6,10 @@ import AppError from "#utils/AppError.js";
 import mongoose from "mongoose";
 
 const seedDB = async (req, res, next) => {
+const NUMBER_OF_DEPARTMENTS_TO_CREATE = 5;
+const NUMBER_OF_PRODUCTION_LINES_TO_CREATE = 3;
+const NUMBER_OF_WORK_POSITIONS_TO_CREATE = 5;
+
   if (process.env.NODE_ENV != "test") {
     const error = new AppError(
       `Path ${req.originalUrl} does not exist for ${req.method} method`,
@@ -19,11 +23,14 @@ const seedDB = async (req, res, next) => {
   const departments = createDepartmentsList(5);
 
   const productionLinesList = createProductionLinesList(3, departments);
+  const departments = createDepartmentsList();
+  const workPositions = createWorkPositionsList();
+  const productionLinesList = createProductionLinesList(departments);
 
   departments.forEach((department, i) => {
     department.productionLines = productionLinesList.slice(
-      i * 3, // Find start position
-      (i + 1) * 3 // Find end position
+      i * NUMBER_OF_PRODUCTION_LINES_TO_CREATE, // Find start position
+      (i + 1) * NUMBER_OF_PRODUCTION_LINES_TO_CREATE, // Find end position
     );
   });
 
@@ -60,7 +67,7 @@ const dropDB = async (req, res, next) => {
 
 const createDepartmentsList = (num) => {
   return Array.from(
-    { length: num },
+    { length: NUMBER_OF_DEPARTMENTS_TO_CREATE },
     (_, i) =>
       new Department({
         departmentName: `Department ${i + 1}`,
@@ -71,7 +78,7 @@ const createDepartmentsList = (num) => {
 
 const createWorkPositionsList = (num) => {
   return Array.from(
-    { length: num },
+    { length: NUMBER_OF_WORK_POSITIONS_TO_CREATE },
     (_, i) =>
       new WorkPosition({
         positionName: `Position Name ${i + 1}`,
@@ -83,7 +90,7 @@ const createProductionLinesList = (num, departmentList) => {
   return departmentList
     .map((department, i) =>
       Array.from(
-        { length: num },
+        { length: NUMBER_OF_PRODUCTION_LINES_TO_CREATE },
         (_, j) =>
           new ProductionLine({
             lineName: `Production Line${i} ${j}`,

@@ -1,5 +1,5 @@
 import mongooseSession from "../mongooseSession.js";
-import AppError from "#utils/appError.js";
+import AppError from "#utils/AppError.js";
 import mongoose from "mongoose";
 
 vi.mock("mongoose", () => ({
@@ -11,7 +11,7 @@ vi.mock("mongoose", () => ({
   },
 }));
 
-vi.mock("#utils/appError.js", () => ({ default: vi.fn() }));
+vi.mock("#utils/AppError.js", () => ({ default: vi.fn() }));
 
 describe("Mongoose session wrapper", () => {
   const controller = vi.fn();

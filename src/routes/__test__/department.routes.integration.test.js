@@ -1,6 +1,6 @@
+import Department from "#models/department";
 import request from "supertest";
-import app from "./src/app.js";
-import Department from "#models/department.js";
+import app from "./src/app";
 import mongoose from "mongoose";
 
 describe("Department Routes", () => {
@@ -72,7 +72,7 @@ describe("Department Routes", () => {
       const resBody = response.body;
 
       expect(response.statusCode).toBe(200);
-      expect(resBody.data[0].departmentName).toBe(department.departmentName);
+      expect(resBody.data.departmentName).toBe(department.departmentName);
     });
 
     test("should fail to find departments if invalid id provided", async () => {
@@ -86,7 +86,7 @@ describe("Department Routes", () => {
     });
   });
 
-  describe("POST /api/department/:_id", async () => {
+  describe("POST /api/department/:_id", () => {
     const params = { departmentName: "starship construction" };
 
     test("should successfully update department document", async () => {

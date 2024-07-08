@@ -1,28 +1,33 @@
+import Department from "#models/department";
+import * as departmentController from "#controllers/department.controller";
+import { validate, checkId, checkName } from "./validation";
 import { Router } from "express";
-import createDepartment from "#controllers/department/createDepartment.js";
-import readDepartment from "#controllers/department/readDepartment.js";
-import updateDepartment from "#controllers/department/updateDepartment.js";
-import deleteDepartment from "#controllers/department/deleteDepartment.js";
-import { validate, checkId, checkName } from "./validation.js";
-import Department from "#models/department.js";
 
 const router = Router();
 
 router.post(
   "/",
   [checkName("departmentName", Department), validate],
-  createDepartment
+  departmentController.createDepartment,
 );
 
-router.get("/:_id", [checkId(Department), validate], readDepartment);
-router.get("/", readDepartment);
+router.get(
+  "/:_id",
+  [checkId(Department), validate],
+  departmentController.readDepartment,
+);
+router.get("/", departmentController.readDepartment);
 
 router.patch(
   "/:_id",
   [checkId(Department), checkName("departmentName", Department), validate],
-  updateDepartment
+  departmentController.updateDepartment,
 );
 
-router.delete("/:_id", [checkId(Department), validate], deleteDepartment);
+router.delete(
+  "/:_id",
+  [checkId(Department), validate],
+  departmentController.deleteDepartment,
+);
 
 export default router;

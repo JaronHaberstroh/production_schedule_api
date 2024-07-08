@@ -1,28 +1,34 @@
+import ProductionLine from "#models/productionLine";
+import * as productionLineController from "#controllers/productionLine.controller";
+import mongooseSession from "#middleware/mongooseSession";
+import { checkId, checkName, validate } from "./validation";
 import { Router } from "express";
-import mongooseSession from "#middleware/mongooseSession.js";
-import createProductionLine from "#controllers/productionLine/createProductionLine.js";
-import readProductionLine from "#controllers/productionLine/readProductionLine.js";
-import updateProductionLine from "#controllers/productionLine/updateProductionLine.js";
-import { checkId, checkName, validate } from "./validation.js";
-import ProductionLine from "#models/productionLine.js";
 
 const router = Router({ mergeParams: true });
 
 router.post(
   "/",
   [checkName("lineName", ProductionLine), validate],
-  mongooseSession(createProductionLine)
+  mongooseSession(productionLineController.createProductionLine),
 );
 
-router.get("/:_id", [checkId(ProductionLine), validate], readProductionLine);
-router.get("/", readProductionLine);
+router.get(
+  "/:_id",
+  [checkId(ProductionLine), validate],
+  productionLineController.readProductionLine,
+);
+router.get("/", productionLineController.readProductionLine);
 
 router.patch(
   "/:_id",
   [checkId(ProductionLine), checkName("lineName", ProductionLine), validate],
-  mongooseSession(updateProductionLine)
+  mongooseSession(productionLineController.updateProductionLine),
 );
 
-router.delete("/", [checkId(ProductionLine), validate]);
+router.delete(
+  "/:_id",
+  [checkId(ProductionLine), validate],
+  mongooseSession(productionLineController.deleteProductionLine),
+);
 
 export default router;

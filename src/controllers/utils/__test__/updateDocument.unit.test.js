@@ -1,63 +1,38 @@
-import { connectDB, disconnectDB } from "#utils/mongoDB/mongooseSetup.js";
-import updateDocumment from "../updateDocument.js";
+import updateDocument from "../updateDocument.js";
 
 describe("updateDocument()", () => {
-  let mongoConnection, mongoReplSet;
+  const document = { _id: "test id", name: "original name" };
 
-  let testDocument, updateDocumentData;
-  beforeAll(async () => {
-    ({ mongoConnection, mongoReplSet } = await connectDB());
+  test("should return updated document with merged properties", () => {
+    const params = { name: "updated name" };
+
+    const result = updateDocument({ ...document }, params);
+
+    const expectedResult = { _id: "test id", name: "updated name" };
+
+    expect(result).toEqual(expectedResult);
   });
 
-  beforeEach(async () => {
-    // Create testDocument in DB
-    const document = new testModel(testData);
-    testDocument = await document.save();
+  test("should add new fields", () => {
+    const params = { age: 34, time: "now" };
 
-    // Create updateDocumentData
-    updateDocumentData = {
-      query: testDocument._id,
-      params: { name: "Jane", age: 34, gender: "female" },
+    const result = updateDocument({ ...document }, params);
+
+    const expectedResult = {
+      _id: "test id",
+      name: "original name",
+      age: 34,
+      time: "now",
     };
+
+    expect(result).toEqual(expectedResult);
   });
 
-  afterAll(async () => {
-    await disconnectDB(mongoConnection, mongoReplSet);
-  });
+  test("should return original document if params are empty", () => {
+    const params = {};
 
-  test("should return success object when successful", async () => {
-    // Call update document
-    const result = await updateDocumment(testModel, updateDocumentData);
+    const result = updateDocument({ ...document }, params);
 
-    // Expect successful return object
-    expect(result.success).toBeTruthy();
-    expect(result.message).toBeTruthy();
-    expect(result.data).toBeTruthy();
-    expect(result.error).toBe(null);
-  });
-
-  test("should update document in DB", async () => {
-    // Update document
-    const result = await updateDocumment(testModel, updateDocumentData);
-
-    // Call update document
-    const updatedDocument = await testModel.findOne(testDocument._id);
-
-    // Expect document to have been updated
-    expect(updatedDocument.name).toBe(updateDocumentData.params.name);
-  });
-
-  test("should return fail object when fails", async () => {
-    // Alter test variables to force fail
-    updateDocumentData.query = null;
-
-    // Call update document
-    const result = await updateDocumment(testModel, updateDocumentData);
-
-    // Expect failure return object
-    expect(result.success).toBeFalsy();
-    expect(result.message).toBeTruthy();
-    expect(result.data).toBe(null);
-    expect(result.error).toBeTypeOf("object");
+    expect(result).toEqual(document);
   });
 });

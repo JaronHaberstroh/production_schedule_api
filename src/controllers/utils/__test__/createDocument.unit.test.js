@@ -1,46 +1,21 @@
-import { connectDB, disconnectDB } from "#utils/mongoDB/mongooseSetup.js";
 import createDocument from "../createDocument.js";
 
 describe("createDocumnet()", () => {
-  let mongoConnection, mongoReplSet;
-  beforeAll(async () => {
-    ({ mongoConnection, mongoReplSet } = await connectDB());
+  let mockModel, mockParams;
+  beforeAll(() => {
+    mockModel = vi.fn();
+
+    mockParams = { name: "test name", age: 44 };
   });
 
-  afterAll(async () => {
-    await disconnectDB(mongoConnection, mongoReplSet);
-  });
+  test("should return document created with given Model and params", () => {
+    mockModel.mockImplementation((params) => {
+      return { ...params };
+    });
 
-  test("should return success object on successful completion", async () => {
-    // Create document
-    const document = await createDocument(testModel, testData);
+    const document = createDocument(mockModel, mockParams);
 
-    // Expect successful return object
-    expect(document.success).toBeTruthy();
-    expect(document.message).toBeTruthy();
-    expect(document.data).toBeTruthy();
-    expect(document.error).toBe(null);
-  });
-
-  test("should create document in DB", async () => {
-    // Create document
-    const document = await createDocument(testModel, testData);
-
-    // Find document in DB
-    const result = await testModel.findOne(document.data._id);
-
-    // Expect data to be in DB
-    expect(result).toBeTruthy();
-    expect(result._id).toEqual(document.data._id);
-  });
-
-  test("should return fail object when fails", async () => {
-    // Create Document
-    const document = await createDocument(testModel, {});
-
-    expect(document.success).toBeFalsy();
-    expect(document.message).toBeTruthy();
-    expect(document.data).toBe(null);
-    expect(document.error).toBeTypeOf("object");
+    expect(mockModel).toBeCalledWith(mockParams);
+    expect(document).toEqual({ ...mockParams });
   });
 });

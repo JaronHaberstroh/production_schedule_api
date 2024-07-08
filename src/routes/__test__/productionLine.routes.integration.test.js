@@ -1,7 +1,7 @@
+import ProductionLine from "#models/productionLine";
+import Department from "#models/department";
 import request from "supertest";
-import app from "src/app.js";
-import Department from "#models/department.js";
-import ProductionLine from "#models/productionLine.js";
+import app from "src/app";
 import mongoose from "mongoose";
 
 describe("Production line routes", () => {
@@ -21,7 +21,8 @@ describe("Production line routes", () => {
   afterAll(async () => {
     await request(app).delete("/api/test/dropDB");
   });
-  describe(`POST ${route}`, () => {
+
+  describe(`POST /api/departments/:departmentId/production-lines/`, () => {
     test("should create a new productionLine and update it's department productionLine list", async () => {
       const newProductionLine = {
         lineName: "Test Line",
@@ -33,9 +34,9 @@ describe("Production line routes", () => {
       const updatedDepartment = await Department.findById(department.id);
 
       expect(response.statusCode).toBe(201);
-      expect(resBody.data._id).toBeTruthy();
+      expect(resBody.data.productionLine._id).toBeTruthy();
       expect(updatedDepartment.productionLines[3].toString()).toEqual(
-        resBody.data._id
+        resBody.data.productionLine._id,
       );
     });
 
@@ -51,7 +52,7 @@ describe("Production line routes", () => {
     });
   });
 
-  describe(`GET ${route}`, () => {
+  describe(`GET /api/departments/:departmentId/production-lines/`, () => {
     test("should find all production lines", async () => {
       const response = await request(app).get(route);
       const resBody = response.body;
@@ -59,6 +60,7 @@ describe("Production line routes", () => {
       expect(response.statusCode).toBe(200);
       expect(resBody.data.length).toBe(3);
     });
+
     test("should fail to find production lines if non exist", async () => {
       await ProductionLine.deleteMany();
 
@@ -70,7 +72,7 @@ describe("Production line routes", () => {
     });
   });
 
-  describe(`GET ${route}:_id`, async () => {
+  describe(`GET /api/departments/:departmentId/production-lines/:_id`, () => {
     test("should find production line matching given id", async () => {
       const productionLine = await ProductionLine.findOne();
 
@@ -78,8 +80,9 @@ describe("Production line routes", () => {
       const resBody = response.body;
 
       expect(response.statusCode).toBe(200);
-      expect(resBody.data[0].lineName).toBe(productionLine.lineName);
+      expect(resBody.data.lineName).toBe(productionLine.lineName);
     });
+
     test("should fail to find production line if invalid id provided", async () => {
       const query = new mongoose.Types.ObjectId();
 
@@ -91,7 +94,7 @@ describe("Production line routes", () => {
     });
   });
 
-  describe(`PATCH ${route}:_id`, async () => {
+  describe(`PATCH /api/departments/:departmentId/production-lines/:_id`, () => {
     test("should successfully update production line", async () => {
       const productionLine = await ProductionLine.findOne({
         department: department.id,
@@ -112,13 +115,14 @@ describe("Production line routes", () => {
       const updatedDepartment = await Department.findById(params.department);
 
       expect(response.statusCode).toBe(200);
-      expect(resBody.data.lineName).toBe(params.lineName);
-      expect(resBody.data.department).toBe(params.department);
+      expect(resBody.data.productionLine.lineName).toBe(params.lineName);
+      expect(resBody.data.productionLine.department).toBe(params.department);
       expect(updatedDepartment.productionLines.length).toBe(4);
       expect(updatedDepartment.productionLines[3].toString()).toBe(
-        productionLine.id
+        productionLine.id,
       );
     });
+
     test("should fail to update production line if params not provided", async () => {
       const productionLine = await ProductionLine.findOne({
         department: department.id,
@@ -132,6 +136,7 @@ describe("Production line routes", () => {
       expect(response.statusCode).toBe(400);
       expect(resBody.message).toContain("Validation Error");
     });
+
     test("should fail to update production line if invalid id provided", async () => {
       const invalidId = new mongoose.Types.ObjectId();
 
@@ -143,8 +148,41 @@ describe("Production line routes", () => {
     });
   });
 
-  describe(`DELETE ${route}:_id`, async () => {
-    test("should successfully delete production line", async () => {});
-    test("should fail to delete production line if id not found", async () => {});
+  describe(`DELETE /api/departments/:departmentId/production-lines/:_id`, () => {
+    test("should successfully delete production line", async () => {
+      const departmentId = department.id;
+
+      const productionLine = await ProductionLine.findOne({
+        department: departmentId,
+      });
+
+      const response = await request(app).delete(
+        `${route}${productionLine.id}`,
+      );
+      const resBody = response.body;
+
+      const deletedProductionLine = await ProductionLine.findById(
+        productionLine.id,
+      );
+
+      const updatedDepartment = await Department.findById(departmentId);
+
+      expect(response.statusCode).toBe(200);
+      expect(resBody.message).toContain("Success");
+      expect(deletedProductionLine).toBe(null);
+      expect(updatedDepartment.productionLines).not.toContain(
+        productionLine.id,
+      );
+    });
+
+    test("should fail to delete production line if id not found", async () => {
+      const productionLineId = new mongoose.Types.ObjectId();
+
+      const response = await request(app).delete(`${route}${productionLineId}`);
+      const resBody = response.body;
+
+      expect(response.statusCode).toBe(400);
+      expect(resBody.message).toContain("Validation Error");
+    });
   });
 });

@@ -1,13 +1,16 @@
 import createDocument from "#controllers/utils/createDocument.js";
+import saveDocument from "#controllers/utils/saveDocument";
 import Department from "#models/department.js";
-import { successResponse } from "#responses/response.js";
 import AppError from "#utils/appError.js";
+import { successResponse } from "#responses/response.js";
 
 const createDepartment = async (req, res, next) => {
-  try {
-    const departmentData = req.body;
+  const departmentData = req.body;
 
-    const result = await createDocument(Department, departmentData);
+  try {
+    const document = createDocument(Department, departmentData);
+
+    const result = await saveDocument(document);
 
     const error = handleResult(res, result);
     if (error) {
@@ -17,17 +20,17 @@ const createDepartment = async (req, res, next) => {
     next(
       new AppError(
         `Unhandled Exception: ${error.message}`,
-        error.statusCode || 500
-      )
+        error.statusCode || 500,
+      ),
     );
   }
 };
 
 const handleResult = (res, result) => {
-  if (result.error) {
+  if (!result.success) {
     return new AppError(
-      `Error while saving Department document: ${result.message}`,
-      result.statusCode || 500
+      `Error occured while saving Department document: ${result.message}`,
+      result.statusCode || 500,
     );
   }
 

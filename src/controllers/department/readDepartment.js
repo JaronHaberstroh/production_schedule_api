@@ -1,15 +1,15 @@
-import readDocument from "#controllers/utils/readDocument.js";
+import findDocuments from "#controllers/utils/findDocuments.js";
 import Department from "#models/department.js";
-import { successResponse } from "#responses/response.js";
 import AppError from "#utils/appError.js";
+import { successResponse } from "#responses/response.js";
 
 const readDepartment = async (req, res, next) => {
-  try {
-    const departmentId = req.params._id;
+  const departmentId = req.params._id;
 
+  try {
     const params = departmentId ? { _id: departmentId } : {};
 
-    const result = await readDocument(Department, params);
+    const result = await findDocuments(Department, params);
 
     const error = handleResult(res, result);
     if (error) {
@@ -19,8 +19,8 @@ const readDepartment = async (req, res, next) => {
     next(
       new AppError(
         `Unhandled Exception: ${error.message}`,
-        error.statusCode || 500
-      )
+        error.statusCode || 500,
+      ),
     );
   }
 };
@@ -29,7 +29,7 @@ const handleResult = (res, result) => {
   if (result.error) {
     return new AppError(
       `Error while fetching Department data: ${result.message}`,
-      result.statusCode || 500
+      result.statusCode || 500,
     );
   }
 

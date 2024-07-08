@@ -1,43 +1,38 @@
-import readDocument from "#controllers/utils/readDocument.js";
+import findDocuments from "#controllers/utils/findDocuments.js";
 import ProductionLine from "#models/productionLine.js";
 import { successResponse } from "#responses/response.js";
 import AppError from "#utils/appError.js";
 
 const readProductionLine = async (req, res, next) => {
-  try {
-    const departmentId = req.params.departmentId;
-    const productionLineId = req.params._id;
+  const { departmentId, _id: productionLineId } = req.params;
 
+  try {
     const params = {
       ...(departmentId && { department: departmentId }),
       ...(productionLineId && { _id: productionLineId }),
     };
 
-    const result = await readDocument(ProductionLine, params);
+    const result = await findDocuments(ProductionLine, params);
 
     const error = handleResult(res, result);
     if (error) {
-      return next(error);
+      next(error);
     }
   } catch (error) {
     const err = new AppError(
       `Unhandled Exception: ${error.message}`,
-      error.statusCode || 500
+      error.statusCode || 500,
     );
     next(err);
   }
 };
 
 const handleResult = (res, result) => {
-  if (result.error) {
+  if (!result.success) {
     return new AppError(
-      `Error while fetching Production Line data: ${result.message}`,
-      result.statusCode || 500
+      `Failed to find production lines: ${result.message}`,
+      result.statusCode || 500,
     );
-  }
-
-  if (result.data.length === 0) {
-    return new AppError(`No data returned from search:`, 404);
   }
 
   res

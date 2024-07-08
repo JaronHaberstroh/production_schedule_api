@@ -2,7 +2,7 @@ import Department from "#models/department.js";
 import ProductionLine from "#models/productionLine.js";
 import WorkPosition from "#models/workPosition.js";
 import { successResponse } from "#responses/response.js";
-import AppError from "#utils/appError.js";
+import AppError from "#utils/AppError.js";
 import mongoose from "mongoose";
 
 const seedDB = async (req, res, next) => {

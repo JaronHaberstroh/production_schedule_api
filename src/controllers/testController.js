@@ -5,24 +5,19 @@ import { successResponse } from "#responses/response.js";
 import AppError from "#utils/AppError.js";
 import mongoose from "mongoose";
 
-const seedDB = async (req, res, next) => {
 const NUMBER_OF_DEPARTMENTS_TO_CREATE = 5;
 const NUMBER_OF_PRODUCTION_LINES_TO_CREATE = 3;
 const NUMBER_OF_WORK_POSITIONS_TO_CREATE = 5;
 
+export const seedDB = async (req, res, next) => {
   if (process.env.NODE_ENV != "test") {
     const error = new AppError(
       `Path ${req.originalUrl} does not exist for ${req.method} method`,
-      404
+      404,
     );
     return next(error);
   }
 
-  const workPositions = createWorkPositionsList(5);
-
-  const departments = createDepartmentsList(5);
-
-  const productionLinesList = createProductionLinesList(3, departments);
   const departments = createDepartmentsList();
   const workPositions = createWorkPositionsList();
   const productionLinesList = createProductionLinesList(departments);
@@ -40,53 +35,57 @@ const NUMBER_OF_WORK_POSITIONS_TO_CREATE = 5;
       WorkPosition.insertMany(workPositions),
       ProductionLine.insertMany(productionLinesList),
     ]);
-    res.status(200).json(successResponse("DB seeding completed", 201));
+
+    const response = successResponse("Successfully populated DB", 201);
+    res.status(200).json(response);
   } catch (error) {
     const err = new AppError(`Error while seeding DB; ${error.message}`, 500);
     return next(err);
   }
 };
 
-const dropDB = async (req, res, next) => {
+export const dropDB = async (req, res, next) => {
   if (process.env.NODE_ENV != "test") {
     const error = new AppError(
       `Path ${req.originalUrl} does not exist for ${req.method} method`,
-      404
+      404,
     );
     return next(error);
   }
 
   try {
     await mongoose.connection.db.dropDatabase();
-    res.status(200).json(successResponse("DB drop completed", 200));
+
+    const response = successResponse("Successfully dropped DB", 200);
+    res.status(200).json(response);
   } catch (error) {
     const err = new AppError(`Error while dropping DB; ${error.message}`, 500);
     return next(err);
   }
 };
 
-const createDepartmentsList = (num) => {
+const createDepartmentsList = () => {
   return Array.from(
     { length: NUMBER_OF_DEPARTMENTS_TO_CREATE },
     (_, i) =>
       new Department({
         departmentName: `Department ${i + 1}`,
         productionLines: [],
-      })
+      }),
   );
 };
 
-const createWorkPositionsList = (num) => {
+const createWorkPositionsList = () => {
   return Array.from(
     { length: NUMBER_OF_WORK_POSITIONS_TO_CREATE },
     (_, i) =>
       new WorkPosition({
         positionName: `Position Name ${i + 1}`,
-      })
+      }),
   );
 };
 
-const createProductionLinesList = (num, departmentList) => {
+const createProductionLinesList = (departmentList) => {
   return departmentList
     .map((department, i) =>
       Array.from(
@@ -95,10 +94,8 @@ const createProductionLinesList = (num, departmentList) => {
           new ProductionLine({
             lineName: `Production Line${i} ${j}`,
             department: department._id,
-          })
-      )
+          }),
+      ),
     )
     .flat();
 };
-
-export { seedDB, dropDB };

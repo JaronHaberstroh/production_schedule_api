@@ -1,28 +1,30 @@
+import * as workPositionController from "#controllers/workPosition.controller";
+import WorkPosition from "#models/workPosition";
+import { checkId, checkName, validate } from "./validation";
 import { Router } from "express";
-import createWorkPosition from "#controllers/workPosition/createWorkPosition.js";
-import readWorkPosition from "#controllers/workPosition/readWorkPosition.js";
-import updateWorkPosition from "#controllers/workPosition/updateWorkPositions.js";
-import deleteWorkPosition from "#controllers/workPosition/deleteWorkPosition.js";
-import { checkId, checkName, validate } from "./validation.js";
-import WorkPosition from "#models/workPosition.js";
 
 const router = Router();
 
 router.post(
   "/",
   [checkName("positionName", WorkPosition), validate],
-  createWorkPosition
+  workPositionController.createWorkPosition,
 );
-
-router.get("/:_id", [checkId(WorkPosition), validate], readWorkPosition);
-router.get("/", readWorkPosition);
-
+router.get(
+  "/:_id",
+  [checkId(WorkPosition), validate],
+  workPositionController.readWorkPosition,
+);
+router.get("/", workPositionController.readWorkPosition);
 router.patch(
   "/:_id",
   [checkId(WorkPosition), checkName("positionName", WorkPosition), validate],
-  updateWorkPosition
+  workPositionController.updateWorkPosition,
 );
-
-router.delete("/:_id", [checkId(WorkPosition), validate], deleteWorkPosition);
+router.delete(
+  "/:_id",
+  [checkId(WorkPosition), validate],
+  workPositionController.deleteWorkPosition,
+);
 
 export default router;

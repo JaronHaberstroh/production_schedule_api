@@ -1,6 +1,6 @@
+import WorkPosition from "#models/workPosition";
 import request from "supertest";
-import app from "src/app.js";
-import WorkPosition from "#models/workPosition.js";
+import app from "src/app";
 import mongoose from "mongoose";
 
 describe("Work Position Routes", () => {
@@ -70,7 +70,7 @@ describe("Work Position Routes", () => {
       const resBody = response.body;
 
       expect(response.statusCode).toBe(200);
-      expect(resBody.data[0].positionName).toBe(workPosition.positionName);
+      expect(resBody.data.positionName).toBe(workPosition.positionName);
     });
 
     test("should fail to find work positions if invalid id provided", async () => {

@@ -1,6 +1,6 @@
-import AppError from "#utils/appError.js";
+import AppError from "#utils/AppError.js";
 
-const successResponse = (message, statusCode, data = null) => {
+export const successResponse = (message, statusCode, data = null) => {
   return {
     success: true,
     statusCode,
@@ -10,7 +10,7 @@ const successResponse = (message, statusCode, data = null) => {
   };
 };
 
-const errorResponse = (message, statusCode) => {
+export const errorResponse = (message, statusCode) => {
   return {
     success: false,
     statusCode,
@@ -19,4 +19,3 @@ const errorResponse = (message, statusCode) => {
     error: new AppError(message, statusCode),
   };
 };
-export { successResponse, errorResponse };

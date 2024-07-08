@@ -1,4 +1,4 @@
-import AppError from "#utils/appError.js";
+import AppError from "#utils/AppError.js";
 import mongoose from "mongoose";
 
 const mongooseSession = (controller) => async (req, res, next) => {
@@ -15,7 +15,7 @@ const mongooseSession = (controller) => async (req, res, next) => {
   } catch (error) {
     const err = new AppError(
       `Session Error: ${error.message}`,
-      error.status || 500
+      error.status || 500,
     );
 
     next(err);

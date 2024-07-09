@@ -2,7 +2,7 @@ import * as departmentController from "#controllers/department.controller";
 import * as departmentService from "src/services/department/department.service";
 import { successResponse } from "#responses/response";
 
-vi.mock("src/services/department/departmentService");
+vi.mock("src/services/department/department.service");
 vi.mock("#responses/response");
 
 describe("Department controller", () => {
